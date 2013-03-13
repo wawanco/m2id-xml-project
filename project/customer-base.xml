@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<customerList>
+	<customer>
+		<name>Dupont</name>
+		<firstname>Jean</firstname>
+		<id>2215</id>
+		<checkbook>
+			<check>
+				<id>955</id>
+				<currency>euros</currency>
+			</check>
+			<check>
+				<id>956</id>
+				<currency>dollars</currency>
+			</check>
+		</checkbook>
+	</customer>
+</customerList>

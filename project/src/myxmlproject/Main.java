@@ -2,12 +2,14 @@ package myxmlproject;
 
 public class Main {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		System.out.println("Hello World!");
+		// 1. Initialiser les objets GdC
+		// 2. print "Choix du Gdc?"
+		// 3. scan
+		// 4. print "Infos?"
+		// 5. scan
+		// 6. Remplir classe client : getter/setter
+		// 7. Enregister le client chez le GdC
+		// Attention gestion des clients existants avec login
 	}
-
 }
