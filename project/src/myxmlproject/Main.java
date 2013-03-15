@@ -42,8 +42,7 @@ public class Main {
 					System.out.println("Type " +  id + " for " + name + ".");
 				}
 				String input2 = stdinp.readLine();
-				//bank.setId(Integer.parseInt(input2));
-				//bank.setName(bank.getId());
+				customer.setIdBank(Integer.parseInt(input2));
 				System.out.println("Please type your name.");
 				customer.setName(stdinp.readLine());
 				System.out.println("Please type your firstname.");
@@ -56,7 +55,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		
-		// 1. Initialiser les objets GdC ???
+		// 1. Initialiser les objets GdC ??? ok
 		// 2. print "Choix du Gdc?" ok
 		// 3. scan ok
 		// 4. print "Infos?" ok
