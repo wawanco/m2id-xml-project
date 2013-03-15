@@ -1,27 +1,26 @@
 package myxmlproject;
 
+import java.nio.file.Path;
+
 public class Bank {
-	static String pathToBase;
+	static String baseDir = ".";
 	private int id;
 	private String name;
+	private String pathToBase;
+	
+	public Bank(int id, String name) {
+		this.id = id;
+		this.name = name;
+		pathToBase = buildPath();
+	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(int id) {
-		if (id == 1){
-			this.name = "lcl";
-		}else if (id == 2){
-			this.name = "bnp";
-		}else{
-			this.name = "sg";
-		}
-	}
-
 	private String buildPath() {
-		// path/to/base + "bank" + id + ".xml"
-		return "";
+		// Build path to xml file containing the customer database
+		return baseDir + "/customer-base_" + id + ".xml";
 	}
 
 	private void GenerateCustomerId() {

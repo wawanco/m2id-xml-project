@@ -3,25 +3,47 @@ package myxmlproject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Main {
-
+	private static HashMap<Integer, String> banks = new HashMap<Integer, String>();
+	static {
+		banks.put(0, "LCL");
+		banks.put(1, "BNP");
+		banks.put(2, "Société Générale");
+	}
+	
 	public static void main(String[] args) {
 
 		// Initializing
-		Bank bank = new Bank();
+		HashMap<Integer, Bank> bankObj = new HashMap<Integer, Bank>(); 
 		Customer customer = new Customer();
 		BufferedReader stdinp = new BufferedReader(new InputStreamReader(System.in));
+		Iterator it = banks.entrySet().iterator();
+		while(it.hasNext()) {
+			Map.Entry me = (Map.Entry) it.next();
+			int id = (Integer) me.getKey();
+			String name = (String) me.getValue();
+			bankObj.put(id, new Bank(id, name));
+		}
 
 		System.out.println("Welcome. Are you a new customer? Yes/No");
 		try {
 			String input = stdinp.readLine();
 			if (input.equals("Yes")) {
-				System.out.println("Please, choose your bank." + "Type 1 for LCL"
-						+ " Type 2 for BNP Paribas" + " Type 3 for Societe Gnerale");
+				System.out.println("Please, choose your bank.");
+				it = bankObj.entrySet().iterator();
+				while(it.hasNext()) {
+					Map.Entry me = (Map.Entry) it.next();
+					int id = ((Bank) me.getValue()).getId();
+					String name = ((Bank) me.getValue()).getName();
+					System.out.println("Type " +  id + " for " + name + ".");
+				}
 				String input2 = stdinp.readLine();
-				bank.setId(Integer.parseInt(input2));
-				bank.setName(bank.getId());
+				//bank.setId(Integer.parseInt(input2));
+				//bank.setName(bank.getId());
 				System.out.println("Please type your name.");
 				customer.setName(stdinp.readLine());
 				System.out.println("Please type your firstname.");
