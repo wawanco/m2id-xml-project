@@ -19,7 +19,6 @@ public class Main {
 
 		// Initializing
 		HashMap<Integer, Bank> bankObj = new HashMap<Integer, Bank>(); 
-		Customer customer = new Customer();
 		BufferedReader stdinp = new BufferedReader(new InputStreamReader(System.in));
 		Iterator it = banks.entrySet().iterator();
 		while(it.hasNext()) {
@@ -41,13 +40,13 @@ public class Main {
 					String name = ((Bank) me.getValue()).getName();
 					System.out.println("Type " +  id + " for " + name + ".");
 				}
-				String input2 = stdinp.readLine();
-				customer.setIdBank(Integer.parseInt(input2));
+				int idBank = Integer.parseInt(stdinp.readLine());
 				System.out.println("Please type your name.");
-				customer.setName(stdinp.readLine());
+				String name = stdinp.readLine();
 				System.out.println("Please type your firstname.");
-				customer.setFirstname(stdinp.readLine());
+				String firstname = stdinp.readLine();
 				System.out.println("Thank you. You have been registered.");
+				Customer customer = new Customer(firstname, name, idBank);
 			} else if (input.equals("No")) {
 				System.out.println("Customer already exists");
 			}

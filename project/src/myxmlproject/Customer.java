@@ -15,20 +15,9 @@ public class Customer {
 	private String firstname;
 	private ArrayList<Check> checkbook;
 
-	// Getters and setters
-	public void setName(String name) {
+	public Customer(String firstname, String name, int idBank) {
+		this.firstname = firstname;
 		this.name = name;
-	}
-	
-	public void setFirstname(String firstname) {
-			this.firstname = firstname;
-	}
-	
-	public void setId(int id) {
-		this.id = id;
-	}
-		
-	public void setIdBank(int idBank) {
 		this.idBank = idBank;
 	}
 	
