@@ -55,9 +55,10 @@ public class Bank {
 			try {
 				f.createNewFile();
 				BufferedWriter out = new BufferedWriter(new FileWriter(f));
-				out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-				out.write("<customerList>");
-				out.write("</customerList>");
+				out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+				out.write("<!DOCTYPE customerList SYSTEM \"customer-base.dtd\" >\n");
+				out.write("<customerList>\n");
+				out.write("</customerList>\n");
 				out.close();
 			} catch (IOException e) {
 				e.printStackTrace();
