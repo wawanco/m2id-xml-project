@@ -35,13 +35,8 @@ public class Customer {
 		return this.name;
 	}
 
-	public boolean setFirstname(String firstname) {
-		if (firstname != null) {
+	public void setFirstname(String firstname) {
 			this.firstname = firstname;
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	public String getFirstname() {
@@ -77,7 +72,8 @@ public class Customer {
 				+ this.firstname + "with customer id " + this.id + "Bank id"
 				+ this.idBank;
 	}
-
+	
+	//creation d'un cheque par le client
 	public boolean createCheck(int amount, Date date) {
 		if (amount != 0 && date != null) {
 			checkbook.get(0).setAmount(amount);
