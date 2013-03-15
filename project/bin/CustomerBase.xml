@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE customerList SYSTEM "CustomerBase.dtd" >
+<customerList>
+	<customer>
+		<identite firstname="Jean" name="Dupond" />
+		<idCustomer>1</idCustomer>
+		<idBank>1</idBank>
+		<listCheck>
+			<check>
+				<idCheck>1</idCheck>
+				<idBank>1</idBank>
+				<idCustomer>1</idCustomer>
+				<amount>5</amount>
+				<date day="3" year="2012" month="January"/>
+				<currency type="euros"/>
+			</check>
+		</listCheck>
+	</customer>
+	<customer>
+		<identite firstname="Marie" name="Dupond" />
+		<idCustomer>2</idCustomer>
+		<idBank>1</idBank>
+		<listCheck>
+			<check>
+				<idCheck>1</idCheck>
+				<idBank>1</idBank>
+				<idCustomer>2</idCustomer>
+				<amount>3</amount>
+				<date day="2" year="2012" month="January"/>
+				<currency type="dollars"/>
+			</check>
+		</listCheck>
+	</customer>
+</customerList>
