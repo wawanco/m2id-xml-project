@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!DOCTYPE check SYSTEM "check.dtd" >
 <check>
-	<id>955</id>
-	<idBank>3</idBank>
-	<idCustomer>322</idCustomer>
-	<currency>Euros</currency>
-	<amount></amount>
-	<issueDate></issueDate>
+  <idCheck>15</idCheck>
+  <idBank>3</idBank>
+  <idCustomer>1824</idCustomer>
+  <amount>300</amount>
+  <date day="20" month="February" year="2011"/>
+  <currency type="euros">currency</currency>
 </check>
