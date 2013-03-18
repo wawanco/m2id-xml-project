@@ -18,10 +18,11 @@ public class Customer {
 	private String directory;
 	private ArrayList<Check> checkbook;
 
-	public Customer(String firstname, String name, int idBank, int amount) {
+	public Customer(String firstname, String name, int idBank, int id, int amount) {
 		this.firstname = firstname;
 		this.name = name;
 		this.idBank = idBank;
+		this.id = id;
 		this.amount = amount;
 		directory = "./Customer_" + id;
 		File dir = new File(directory);

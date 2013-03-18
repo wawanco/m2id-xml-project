@@ -44,7 +44,13 @@ public class Bank {
 	}
 	
 	public void createCustomer(String firstname, String name, int amount){
-		Customer customer = new Customer(firstname, name, id, amount);
+		Customer customer = new Customer(
+				firstname
+			,	name
+			, 	id
+			, 	generateCustomerId()
+			, 	amount
+			);
 	}
 	
 	public String getName() {
@@ -71,9 +77,9 @@ public class Bank {
 		return path;
 	}
 
-	private void generateCustomerId() {
+	private int generateCustomerId() {
 		// parcours de l'arbre et incrementer l'ID
-		;
+		return 0;
 	}
 
 	private void generateChecks(Customer c, int nbEuros, int nbDollars) {
