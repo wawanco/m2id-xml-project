@@ -16,11 +16,13 @@ import java.nio.file.Path;
 
 public class Bank {
 	static String baseDir = ".";
-	private int id;
-	private String name;
-	private String pathToBase;
+	
+	private int      id;
+	private String   name;
+	private String   pathToBase;
 	private Document customerBase;
 	
+	// Construtor
 	public Bank(int id, String name) {
 		this.id = id;
 		this.name = name;
@@ -43,7 +45,17 @@ public class Bank {
 		}
 	}
 	
-	public void createCustomer(String firstname, String name, int amount){
+	// Getters and setters
+	public int getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+	
+	// Public methods
+	public Customer registerCustomer(String firstname, String name, int amount){
 		Customer customer = new Customer(
 				firstname
 			,	name
@@ -51,12 +63,41 @@ public class Bank {
 			, 	generateCustomerId()
 			, 	amount
 			);
+		addCustomerToBase(customer);
+		return customer;
 	}
 	
-	public String getName() {
-		return name;
+	public void generateChecks(Customer c, int nbEuros, int nbDollars) {
+		for(int i = 0; i < nbEuros; i++) {
+			Check check = new Check(0, id, c.getId(), Check.Currency.Euros);
+			check.createXml(c.getDirectory());
+		}
+		
+		for(int i = 0; i < nbDollars; i++) {
+			Check check = new Check(0, id, c.getId(), Check.Currency.Dollars);
+			check.createXml(c.getDirectory());
+		}
+		
+/*		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+			dbf.setFeature("http://xml.org/sax/features/validation", true);
+			dbf.setValidating(true);
+			dbf.setNamespaceAware(true);
+			DocumentBuilder db;
+			db = dbf.newDocumentBuilder();
+			Document check= db.newDocument();
+			check.createElement("")
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
 	}
 
+	
+	// Private methods
 	private String buildPath() {
 		// Build path to xml file containing the customer database
 		String path = baseDir + "/customer-base_" + id + ".xml";
@@ -81,50 +122,12 @@ public class Bank {
 		// parcours de l'arbre et incrementer l'ID
 		return 0;
 	}
-
-	private void generateChecks(Customer c, int nbEuros, int nbDollars) {
-		for(int i = 0; i < nbEuros; i++) {
-			Check check = new Check(0, id, c.getId(), Check.Currency.Euros);
-			check.createXml("");
-		}
-		
-		for(int i = 0; i < nbDollars; i++) {
-			Check check = new Check(0, id, c.getId(), Check.Currency.Dollars);
-		}
-		
-/*		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try {
-			dbf.setFeature("http://xml.org/sax/features/validation", true);
-			dbf.setValidating(true);
-			dbf.setNamespaceAware(true);
-			DocumentBuilder db;
-			db = dbf.newDocumentBuilder();
-			Document check= db.newDocument();
-			check.createElement("")
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int registerCustomer(Customer c) {
+	
+	private void addCustomerToBase(Customer c) {
 		// parse xml
 		// generer nell Id
 		// ajouter client
-		// generer cheque
-		generateChecks(c, 2, 3);
-		return 0;
+		;
 	}
 
 }

@@ -14,6 +14,7 @@ public class Check {
 	private Date     issueDate;
 	private Currency currency;
 	
+	// Constructor
 	public Check(int id, int idBank, int idCustomer, Currency currency){
 		this.id         = id;
 		this.idBank     = idBank;
@@ -21,10 +22,7 @@ public class Check {
 		this.currency   = currency;
 	}
 	
-	public void createXml(String path){
-		
-	}
-
+	// Getters and setters
 	public void setAmount(int amount) {
 		this.amount = amount;
 	}
@@ -33,47 +31,8 @@ public class Check {
 		this.issueDate = issueDate;
 	}
 
-	/*
-	public int getId() {
-		return id;
+	// Public methods
+	public void createXml(String path){
+		
 	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getIdBank() {
-		return idBank;
-	}
-
-	public void setIdBank(int idBank) {
-		this.idBank = idBank;
-	}
-
-	public int getIdCustomer() {
-		return idCustomer;
-	}
-
-	public void setIdCustomer(int idCustomer) {
-		this.idCustomer = idCustomer;
-	}
-
-	public int getAmount() {
-		return amount;
-	}
-
-
-	public Date getIssueDate() {
-		return issueDate;
-	}
-
-
-	public Currency getCurrency() {
-		return currency;
-	}
-
-	public void setCurrency(Currency currency) {
-		this.currency = currency;
-	}
-	*/
 }

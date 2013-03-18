@@ -18,6 +18,7 @@ public class Customer {
 	private String directory;
 	private ArrayList<Check> checkbook;
 
+	// Constructor
 	public Customer(String firstname, String name, int idBank, int id, int amount) {
 		this.firstname = firstname;
 		this.name = name;
@@ -34,7 +35,11 @@ public class Customer {
 		return id;
 	}
 	
-	// Public functions
+	public String getDirectory() {
+		return directory;
+	}
+	
+	// Public methods
 	public void fillCheck(int amount, Date date) {
 		// Customer will use this function to fill the amount and date of a check
 		if (amount != 0 && date != null) {
@@ -44,7 +49,6 @@ public class Customer {
 		checkbook.get(0).setIssueDate(date);
 	}
 	
-	// Utilities
 	public String toString() {
 		return "Customer name: " + name + "Customer surname: "
 				+ firstname + "with customer id " + id + "Bank id"

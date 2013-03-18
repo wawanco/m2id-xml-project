@@ -51,12 +51,20 @@ public class Main {
 				String firstname = stdinp.readLine();
 				System.out.println("How much money do you want to deposit on your account (in Euros)?");
 				int amount = Integer.parseInt(stdinp.readLine());
-				System.out.println("Thank you. You have been registered.");
-				bankObj.get(idBank).createCustomer(
+				Customer c = bankObj.get(idBank).registerCustomer(
 					firstname
 				,	name
 				,	amount
 				);
+				System.out.println("Thank you. You have been registered.");
+				System.out.println("How many checks do you want :");
+				System.out.println("In Euros ?");
+				int nbEuros = Integer.parseInt(stdinp.readLine());
+				System.out.println("In Dollars ?");
+				int nbDollars = Integer.parseInt(stdinp.readLine());
+				bankObj.get(idBank).generateChecks(c, nbEuros, nbDollars);
+				System.out.println("Your " + (nbDollars + nbEuros) + " check have been generated in your customer directory:");
+				System.out.println("--> " + c.getDirectory());
 			} else if (input.equals("No")) {
 				System.out.println("Customer already exists");
 			}
