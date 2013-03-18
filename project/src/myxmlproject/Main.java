@@ -1,3 +1,7 @@
+//*** TODO ***
+/// Comment setter l'id du customer
+/// Est-ce que la classe check est necessaire
+
 package myxmlproject;
 
 import java.io.BufferedReader;
@@ -45,8 +49,14 @@ public class Main {
 				String name = stdinp.readLine();
 				System.out.println("Please type your firstname.");
 				String firstname = stdinp.readLine();
+				System.out.println("How much money do you want to deposit on your account (in Euros)?");
+				int amount = Integer.parseInt(stdinp.readLine());
 				System.out.println("Thank you. You have been registered.");
-				Customer customer = new Customer(firstname, name, idBank);
+				bankObj.get(idBank).createCustomer(
+					firstname
+				,	name
+				,	amount
+				);
 			} else if (input.equals("No")) {
 				System.out.println("Customer already exists");
 			}

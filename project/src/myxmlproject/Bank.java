@@ -42,7 +42,11 @@ public class Bank {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public void createCustomer(String firstname, String name, int amount){
+		Customer customer = new Customer(firstname, name, id, amount);
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -67,13 +71,37 @@ public class Bank {
 		return path;
 	}
 
-	private void GenerateCustomerId() {
+	private void generateCustomerId() {
 		// parcours de l'arbre et incrementer l'ID
 		;
 	}
 
-	private void GenerateCheck() {
-		;
+	private void generateChecks(Customer c, int nbEuros, int nbDollars) {
+		for(int i = 0; i < nbEuros; i++) {
+			Check check = new Check(0, id, c.getId(), Check.Currency.Euros);
+			check.createXml("");
+		}
+		
+		for(int i = 0; i < nbDollars; i++) {
+			Check check = new Check(0, id, c.getId(), Check.Currency.Dollars);
+		}
+		
+/*		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+			dbf.setFeature("http://xml.org/sax/features/validation", true);
+			dbf.setValidating(true);
+			dbf.setNamespaceAware(true);
+			DocumentBuilder db;
+			db = dbf.newDocumentBuilder();
+			Document check= db.newDocument();
+			check.createElement("")
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
 	}
 
 	public int getId() {
@@ -84,11 +112,12 @@ public class Bank {
 		this.id = id;
 	}
 
-	public int RegisterCustomer(Customer c) {
+	public int registerCustomer(Customer c) {
 		// parse xml
 		// generer nell Id
 		// ajouter client
 		// generer cheque
+		generateChecks(c, 2, 3);
 		return 0;
 	}
 

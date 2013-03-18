@@ -1,5 +1,6 @@
 package myxmlproject;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import sun.util.calendar.BaseCalendar.Date;
@@ -13,12 +14,23 @@ public class Customer {
 	private int idBank;
 	private String name;
 	private String firstname;
+	private int amount;
+	private String directory;
 	private ArrayList<Check> checkbook;
 
-	public Customer(String firstname, String name, int idBank) {
+	public Customer(String firstname, String name, int idBank, int amount) {
 		this.firstname = firstname;
 		this.name = name;
 		this.idBank = idBank;
+		this.amount = amount;
+		directory = "./Customer_" + id;
+		File dir = new File(directory);
+		dir.mkdir();
+	}
+	
+	// Getters and setters
+	public int getId() {
+		return id;
 	}
 	
 	// Public functions
