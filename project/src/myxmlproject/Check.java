@@ -7,13 +7,33 @@ public class Check {
 		Dollars, Euros
 	}
 
-	private int id;
-	private int idBank;
-	private int idCustomer;
-	private int amount;
-	private Date issueDate;
+	private int 	 id;
+	private int      idBank;
+	private int      idCustomer;
+	private int      amount;
+	private Date     issueDate;
 	private Currency currency;
+	
+	public Check(int id, int idBank, int idCustomer, Currency currency){
+		this.id         = id;
+		this.idBank     = idBank;
+		this.idCustomer = idCustomer;
+		this.currency   = currency;
+	}
+	
+	public void createXml(String path){
+		
+	}
 
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+	
+	public void setIssueDate(Date issueDate) {
+		this.issueDate = issueDate;
+	}
+
+	/*
 	public int getId() {
 		return id;
 	}
@@ -42,17 +62,11 @@ public class Check {
 		return amount;
 	}
 
-	public void setAmount(int amount) {
-		this.amount = amount;
-	}
 
 	public Date getIssueDate() {
 		return issueDate;
 	}
 
-	public void setIssueDate(Date issueDate) {
-		this.issueDate = issueDate;
-	}
 
 	public Currency getCurrency() {
 		return currency;
@@ -61,4 +75,5 @@ public class Check {
 	public void setCurrency(Currency currency) {
 		this.currency = currency;
 	}
+	*/
 }
