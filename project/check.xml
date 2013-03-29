@@ -6,5 +6,5 @@
   <idCustomer>1824</idCustomer>
   <amount>300</amount>
   <date day="20" month="February" year="2011"/>
-  <currency type="euros">currency</currency>
+  <currency type="euros"/>
 </check>
