@@ -17,6 +17,36 @@ public class Customer {
 	private int amount;
 	private String directory;
 	private ArrayList<Check> checkbook;
+	private ArrayList<Product> cart;
+	private ArrayList<Check> ckeckRevieved;
+	
+	
+	
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+
+	public ArrayList<Product> getCart() {
+		return cart;
+	}
+
+	public void setCart(ArrayList<Product> cart) {
+		this.cart = cart;
+	}
+
+	public ArrayList<Check> getCkeckRevieved() {
+		return ckeckRevieved;
+	}
+
+	public void setCkeckRevieved(ArrayList<Check> ckeckRevieved) {
+		this.ckeckRevieved = ckeckRevieved;
+	}
+
+
 
 	// Constructor
 	public Customer(String firstname, String name, int idBank, int id, int amount) {
