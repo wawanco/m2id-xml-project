@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="client.xsl"?>
 <!DOCTYPE customerList SYSTEM "customer-base.dtd" >
 <customerList>
 	<customer>
@@ -24,6 +25,21 @@
 			<check>
 				<idCheck>1</idCheck>
 				<idBank>1</idBank>
+				<idCustomer>2</idCustomer>
+				<amount>3</amount>
+				<date day="2" year="2012" month="January"/>
+				<currency type="dollars"/>
+			</check>
+		</listCheck>
+	</customer>
+	<customer>
+		<identite firstname="Robert" name="DeNiro" />
+		<idCustomer>2</idCustomer>
+		<idBank>2</idBank>
+		<listCheck>
+			<check>
+				<idCheck>1</idCheck>
+				<idBank>2</idBank>
 				<idCustomer>2</idCustomer>
 				<amount>3</amount>
 				<date day="2" year="2012" month="January"/>
