@@ -12,7 +12,75 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 public class Main {
+	
+	static class CompanyInitializer extends DefaultHandler {
+		private String vCurrent, bCurrent;
+		private String cName, pName, currency;
+		private int stock;
+		private double price, minAmount;
+		private ArrayList<Product> pList;
+		private ArrayList<Company> cList;
+		static int i = 0;
+		static int idBank = 0;
+		
+        @Override
+		public void startDocument() throws SAXException {
+        	pList = new ArrayList<Product>();
+        	cList = new ArrayList<Company>();
+		}
+		
+        @Override
+		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException{
+			if(qName.equals("product") || qName.equals("company"))
+				bCurrent = qName;
+		}
+			
+		@Override
+		public void characters(char[] arg0, int arg1, int arg2) throws SAXException {
+			vCurrent = new String(arg0, arg1, arg2);
+		}
+		
+		@Override
+		public void endElement(String uri, String localName, String qName) throws SAXException {
+			if(qName.equals("name")){
+				if(bCurrent.equals("company"))
+					cName = vCurrent;
+				if(bCurrent.equals("product"))
+					pName = vCurrent;
+			}
+			if(qName.equals("stock"))
+				stock = Integer.parseInt(vCurrent);
+			if(qName.equals("price"))
+				price = Double.parseDouble(vCurrent);
+			if(qName.equals("min_amount"))
+				minAmount = Double.parseDouble(vCurrent);
+			if(qName.equals("currency"))
+				currency = vCurrent;
+			if(qName.equals("product")) {
+				pList.add(new Product(pName, stock, price));
+			}
+			if(qName.equals("company")) {
+				ArrayList<Product> myProductList = new ArrayList<Product>();
+				for(Product p: pList) myProductList.add(p.clone());
+				cList.add(new Company(i++, cName, idBank, minAmount, currency, myProductList));
+				pList.clear();
+			}
+		}
+
+		public ArrayList<Company> getcList() {
+			return cList;
+		}
+	}
+	
+
 
 	// banks
 	private static HashMap<Integer, String> banks = new HashMap<Integer, String>();
@@ -22,15 +90,31 @@ public class Main {
 		banks.put(2, "Société Générale");
 	}
 
-	private static ArrayList<Company> companies = new ArrayList<Company>();
+	private static ArrayList<Company> companies;
 
 	public static void main(String[] args) {
 
 		// Initializing
 		HashMap<Integer, Bank> bankObj = new HashMap<Integer, Bank>();
-		companies = InitialiseCompanies();
-		BufferedReader stdinp = new BufferedReader(new InputStreamReader(
-				System.in));
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		try {
+			spf.setFeature("http://xml.org/sax/features/validation", true);
+			spf.setValidating(true);
+			spf.setNamespaceAware(true);
+			javax.xml.parsers.SAXParser sp;
+			sp = spf.newSAXParser();
+			CompanyInitializer ci = new CompanyInitializer();
+			sp.parse("companies.xml", ci);
+			companies = ci.getcList();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		BufferedReader stdinp = new BufferedReader(new InputStreamReader(System.in));
 		Iterator it = banks.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry me = (Map.Entry) it.next();
@@ -56,11 +140,9 @@ public class Main {
 				String name = stdinp.readLine();
 				System.out.println("Please type your firstname.");
 				String firstname = stdinp.readLine();
-				System.out
-						.println("How much money do you want to deposit on your account (in Euros)?");
+				System.out.println("How much money do you want to deposit on your account (in Euros)?");
 				int amount = Integer.parseInt(stdinp.readLine());
-				Customer c = bankObj.get(idBank).registerCustomer(firstname,
-						name, amount);
+				Customer c = bankObj.get(idBank).registerCustomer(firstname, name, amount);
 				System.out.println("Thank you. You have been registered.");
 				System.out.println("How many checks do you want :");
 				System.out.println("In Euros ?");
@@ -68,47 +150,32 @@ public class Main {
 				System.out.println("In Dollars ?");
 				int nbDollars = Integer.parseInt(stdinp.readLine());
 				bankObj.get(idBank).generateChecks(c, nbEuros, nbDollars);
-				System.out
-						.println("Your "
-								+ (nbDollars + nbEuros)
-								+ " check have been generated in your customer directory:");
+				System.out.println("Your " + (nbDollars + nbEuros) + " check have been generated in your customer directory:");
 				System.out.println("--> " + c.getDirectory());
 				// Choisir entreprise-produit
-				System.out
-						.println("Please choose the company you wish from the list below: ");
-				for (int i = 0; i <= companies.size(); i++) {
-					System.out.println(i + ") " + "Type -" + i + "- for "
-							+ companies.get(i).getName());
+				System.out.println("Please choose the company you wish from the list below: ");
+				for (int i = 0; i < companies.size(); i++) {
+					System.out.println(i + ") " + "Type -" + i + "- for " + companies.get(i).getName());
 				}
 				int idCompany = Integer.parseInt(stdinp.readLine());
 				int selection = 3;
 				while (selection == 3) {
-					System.out
-							.println("Plesae choose a product from the list below: ");
-					for (int i = 0; i <= companies.get(idCompany)
-							.getProductList().size(); i++) {
-						System.out.println(i
-								+ ") "
-								+ "Type -"
-								+ i
-								+ "- if you want to buy"
-								+ companies.get(idCompany).getProductList()
-										.get(i).getName());
+					Company chosenCpny = companies.get(idCompany);
+					System.out.println("Please choose a product from the list below: ");
+					for (int i = 0; i < chosenCpny.getProductList().size(); i++) {
+						System.out.println(i + ") "	+ "Type -" + i + "- if you want to buy " + chosenCpny.getProductList().get(i).getName());
 					}
-					Product product = companies.get(idCompany).getProductList()
-							.get(Integer.parseInt(stdinp.readLine()));
+					Product product = chosenCpny.getProductList().get(Integer.parseInt(stdinp.readLine()));
 					System.out.println("The price of the product selected is "
 							+ product.getUnitPrice() + " "
 							+ companies.get(idCompany).getCurrency());
-					System.out
-							.println("Select the quantity that you wish to buy: ");
+					System.out.println("Select the quantity that you wish to buy: ");
 					int quantity = Integer.parseInt(stdinp.readLine());
-					float totalPrice = quantity * product.getUnitPrice();
+					double totalPrice = quantity * product.getUnitPrice();
 					System.out.println("The total price of your selection is "
 							+ totalPrice + " "
 							+ companies.get(idCompany).getCurrency());
-					System.out
-							.println("If you want to validate your command, please type 1. "
+					System.out.println("If you want to validate your command, please type 1. "
 									+ "If you want to cancel your command, please type 2."
 									+ "If you want to buy another product, please type 3");
 					selection = Integer.parseInt(stdinp.readLine());
@@ -119,62 +186,5 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		// 1. Initialiser les objets GdC ??? ok
-		// 2. print "Choix du Gdc?" ok
-		// 3. scan ok
-		// 4. print "Infos?" ok
-		// 5. scan ok
-		// 6. Remplir classe client : getter/setter ok
-		// 7. Enregister le client chez le GdC
-		// Attention gestion des clients existants avec login
-	}
-
-	private static ArrayList<Company> InitialiseCompanies() {
-		// products
-		Product burger = new Product("burger", 50, 4f);
-		Product fries = new Product("fries", 100, 1.5f);
-		Product drink = new Product("drink", 100, 1f);
-
-		Product tshirt = new Product("tshirt", 40, 15.99f);
-		Product pants = new Product("pants", 50, 39.99f);
-		Product shoes = new Product("shoes", 20, 34.99f);
-
-		Product travel1 = new Product("Hawaii", 10, 2499f);
-		Product travel2 = new Product("Barcelone", 8, 899f);
-		Product travel3 = new Product("Athens", 5, 499f);
-		// products List
-		ArrayList<Product> productMc = new ArrayList<Product>();
-		ArrayList<Product> productGap = new ArrayList<Product>();
-		ArrayList<Product> productTA = new ArrayList<Product>();
-		ArrayList<Product> productZara = new ArrayList<Product>();
-		// companiesLists
-		productMc.add(burger);
-		productMc.add(fries);
-		productMc.add(drink);
-		productGap.add(tshirt);
-		productGap.add(pants);
-		productGap.add(shoes);
-		productZara.add(tshirt);
-		productZara.add(pants);
-		productZara.add(shoes);
-		productTA.add(travel1);
-		productTA.add(travel2);
-		productTA.add(travel3);
-
-		// initialise Companies
-		Company McDonalds = new Company(0, "McDonalds", 0, 0, "dollars",
-				productMc);
-		Company GAP = new Company(1, "GAP", 0, 20, "dollars", productGap);
-		Company TravelAir = new Company(2, "TravelAir", 1, 40, "euros",
-				productTA);
-		Company ZARA = new Company(3, "ZARA", 2, 10, "euros", productZara);
-
-		companies.add(McDonalds);
-		companies.add(GAP);
-		companies.add(TravelAir);
-		companies.add(ZARA);
-
-		return companies;
 	}
 }

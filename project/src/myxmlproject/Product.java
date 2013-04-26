@@ -3,10 +3,10 @@ package myxmlproject;
 public class Product {
 
 	private int stock;
-	private float unitPrice;
+	private double unitPrice;
 	private String name;
 
-	public Product(String name, int stock, float unitPrice) {
+	public Product(String name, int stock, double unitPrice) {
 		this.stock = stock;
 		this.name = name;
 		this.unitPrice = unitPrice;
@@ -20,12 +20,16 @@ public class Product {
 		this.name = name;
 	}
 
-	public float getUnitPrice() {
+	public double getUnitPrice() {
 		return unitPrice;
 	}
 
 	public void setUnitPrice(float unitPrice) {
 		this.unitPrice = unitPrice;
+	}
+	
+	public Product clone() {
+		return new Product(name, stock, unitPrice);
 	}
 
 }

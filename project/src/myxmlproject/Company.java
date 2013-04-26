@@ -8,17 +8,17 @@ public class Company {
 	private int id;
 	private String name;
 	private int idBank;
-	private int min_amount;
+	private double minAmount;
 	private String currency;
 	private ArrayList<Product> productList;
 
-	public Company(int id, String name, int idBank, int min_amount,
+	public Company(int id, String name, int idBank, double minAmount,
 			String currency, ArrayList<Product> productList) {
 
 		this.id = id;
 		this.name = name;
 		this.idBank = idBank;
-		this.min_amount = min_amount;
+		this.minAmount = minAmount;
 		this.currency = currency;
 		this.productList = productList;
 
@@ -40,12 +40,12 @@ public class Company {
 		this.productList = productList;
 	}
 
-	public int getMin_amount() {
-		return min_amount;
+	public double getMinAmount() {
+		return minAmount;
 	}
 
-	public void setMin_amount(int min_amount) {
-		this.min_amount = min_amount;
+	public void setMinAmount(int min_amount) {
+		this.minAmount = minAmount;
 	}
 
 	public String getCurrency() {

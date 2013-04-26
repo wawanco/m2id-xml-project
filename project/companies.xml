@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<companies>
+<company>
+	<name>Mc Donald</name>
+	<min_amount>40</min_amount>
+	<currency>dollars</currency>
+	<products>
+		<product>
+			<name>Fries</name>
+			<stock>100</stock>
+			<price>1.5</price>
+		</product>
+		<product>
+			<name>Burger</name>
+			<stock>50</stock>
+			<price>4</price>
+		</product>
+		<product>
+			<name>Drink</name>
+			<stock>100</stock>
+			<price>1</price>
+		</product>
+	</products>
+</company>
+<company>
+	<name>Gap</name>
+	<min_amount>0</min_amount>
+	<currency>euros</currency>
+	<products>
+		<product>
+			<name>Tshirt</name>
+			<stock>40</stock>
+			<price>15.99</price>
+		</product>
+		<product>
+			<name>Pants</name>
+			<stock>50</stock>
+			<price>39.99</price>
+		</product>
+		<product>
+			<name>Shoes</name>
+			<stock>20</stock>
+			<price>34.99</price>
+		</product>
+	</products>
+</company>
+<company>
+	<name>Travel Air</name>
+	<min_amount>100</min_amount>
+	<currency>euros</currency>
+	<products>
+		<product>
+			<name>Hawaii</name>
+			<stock>10</stock>
+			<price>2499</price>
+		</product>
+		<product>
+			<name>Barcelone</name>
+			<stock>8</stock>
+			<price>899</price>
+		</product>
+		<product>
+			<name>Athens</name>
+			<stock>5</stock>
+			<price>499</price>
+		</product>
+	</products>
+</company>
+</companies>
