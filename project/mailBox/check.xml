@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone = "no" ?>
+<?xml-stylesheet type="text/xsl" href="check.xsl"?>
+
+<!DOCTYPE check SYSTEM "check.dtd" >
+<check>
+  <idCheck>15</idCheck>
+  <idBank>3</idBank>
+  <idCustomer>1824</idCustomer>
+  <amount>1798</amount>
+  <date day="20" month="February" year="2011"/>
+  <currency type="euros"/>
+</check>
