@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<order>
+		<id>3</id>
+		<customer>
+			<idCustomer>3</idCustomer>
+			<cart>
+				<product>
+					<id>2</id>
+					<name>Barcelone</name>
+					<unitPrice>899</unitPrice>
+					<currency type="euros" />
+				</product>
+				<product>
+					<id>2</id>
+					<name>Barcelone</name>
+					<unitPrice>899</unitPrice>
+					<currency type="euros" />
+				</product>
+			</cart>
+		</customer>
+		<company>
+			<id>2</id>
+			<name>TravelAir</name>
+			<idBank>1</idBank>
+		</company>
+	</order>
