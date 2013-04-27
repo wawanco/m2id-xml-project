@@ -3,8 +3,16 @@ package myxmlproject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import java.io.BufferedWriter;
@@ -26,7 +34,8 @@ public class Bank {
 	public Bank(int id, String name) {
 		this.id = id;
 		this.name = name;
-		pathToBase = buildPath();
+		pathToBase = baseDir + "/customer-base_" + id + ".xml";
+		File f = new File(pathToBase);
 		// Initialize parser
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
@@ -35,7 +44,13 @@ public class Bank {
 			dbf.setNamespaceAware(true);
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
-			customerBase = db.parse(pathToBase);
+			if(! f.isFile()) {
+				customerBase = db.newDocument();
+				Element root = customerBase.createElement("customerList"); 
+				customerBase.appendChild(root);
+			} else {
+				customerBase = db.parse(f);
+			}
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -43,6 +58,7 @@ public class Bank {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		writeXML();
 	}
 	
 	// Getters and setters
@@ -77,47 +93,9 @@ public class Bank {
 			Check check = new Check(0, id, c.getId(), Check.Currency.Dollars);
 			check.createXml(c.getDirectory());
 		}
-		
-/*		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try {
-			dbf.setFeature("http://xml.org/sax/features/validation", true);
-			dbf.setValidating(true);
-			dbf.setNamespaceAware(true);
-			DocumentBuilder db;
-			db = dbf.newDocumentBuilder();
-			Document check= db.newDocument();
-			check.createElement("")
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
 	}
 
-	
 	// Private methods
-	private String buildPath() {
-		// Build path to xml file containing the customer database
-		String path = baseDir + "/customer-base_" + id + ".xml";
-		File f = new File(path);
-		if(! f.isFile()) {
-			try {
-				f.createNewFile();
-				BufferedWriter out = new BufferedWriter(new FileWriter(f));
-				out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-				out.write("<!DOCTYPE customerList SYSTEM \"customer-base.dtd\" >\n");
-				out.write("<customerList>\n");
-				out.write("</customerList>\n");
-				out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return path;
-	}
-
 	private int generateCustomerId() {
 		// parcours de l'arbre et incrementer l'ID
 		return 0;
@@ -129,5 +107,22 @@ public class Bank {
 		// ajouter client
 		;
 	}
+	
+	public void writeXML(){
+		try {
+			// write the content into xml file
+			Transformer tFormer = TransformerFactory.newInstance().newTransformer();
+			tFormer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "customer-base.dtd");
+			DOMSource source = new DOMSource(customerBase);
+			StreamResult result = new StreamResult(new File(pathToBase));
+			// Output to console for testing
+			tFormer.transform(source, result);
+		} catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		}
+ 	}
+
 
 }
