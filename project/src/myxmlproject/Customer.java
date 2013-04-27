@@ -1,6 +1,7 @@
 package myxmlproject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,6 +17,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import sun.util.calendar.BaseCalendar.Date;
 
@@ -81,55 +85,63 @@ public class Customer {
 	}
 
 	// Public methods
-	public void fillCheck(String amount, Date date) {
+	public void fillCheck(int money, Date when) throws IOException,
+			TransformerConfigurationException {
 		// Customer will use this function to fill the amount and date of a
 		// check
-		if (amount != "0" && date != null) {
+		if (amount != 0 && when != null) {
 			throw new Error("Invalid amount or date.");
 		}
 		try {
+
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory
 					.newInstance();
-			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-			Document doc = docBuilder.newDocument();
-			
-			Element rootElement = doc.createElement("check");
-			doc.appendChild(rootElement);
-			
-			Element money = doc.createElement("amount");
-			money.appendChild(doc.createTextNode(amount));
-			rootElement.appendChild(money);
-			
-			Element when = doc.createElement("date");
-			rootElement.appendChild(when);
-			
-			Attr day = doc.createAttribute("day");
-			day.setValue(Integer.toString(date.getDayOfMonth()));
-			when.setAttributeNode(day);
-			
-			Attr month = doc.createAttribute("month");
-			month.setValue(Integer.toString(date.getMonth()));
-			when.setAttributeNode(month);
-			
-			Attr year = doc.createAttribute("year");
-			year.setValue(Integer.toString(date.getYear()));
-			when.setAttributeNode(year);		
-
+			DocumentBuilder docBuilder;
 			try {
+				docBuilder = docFactory.newDocumentBuilder();
+				Document doc = docBuilder.parse("/project/check.xml");
+				Node date = doc.getFirstChild();
+				NamedNodeMap dateAttributes = date.getAttributes();
+				Attr day = doc.createAttribute("day");
+				day.setValue(Integer.toString(when.getDayOfMonth()));
+				dateAttributes.setNamedItem(day);
+
+				Attr month = doc.createAttribute("month");
+				month.setValue(Integer.toString(when.getMonth()));
+				dateAttributes.setNamedItem(month);
+
+				Attr year = doc.createAttribute("year");
+				year.setValue(Integer.toString(when.getYear()));
+				dateAttributes.setNamedItem(year);
+
+				Node amount = doc.createElement("amount");
+				amount.setTextContent(Integer.toString(money));
+				date.appendChild(amount);
+
 				TransformerFactory transformerFactory = TransformerFactory
 						.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();
 				DOMSource source = new DOMSource(doc);
-				StreamResult result = new StreamResult(new File("/project/mailBox/check.xml"));
+				StreamResult result = new StreamResult(new File(
+						"/project/mailBox/check.xml"));
 				try {
 					transformer.transform(source, result);
 				} catch (TransformerException e) {
 					e.printStackTrace();
 				}
-			} catch (TransformerConfigurationException e) {
-				e.printStackTrace();
+			} catch (ParserConfigurationException e2) {
+				e2.printStackTrace();
 			}
-		} catch (ParserConfigurationException e) {
+
+		} catch (SAXException e1) {
+			e1.printStackTrace();
+		}
+
+		// delete last check
+		try {
+			File file = new File("/project/check.xml");
+			file.delete();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
