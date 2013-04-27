@@ -20,8 +20,6 @@ public class Customer {
 	private ArrayList<Product> cart;
 	private ArrayList<Check> ckeckRevieved;
 	
-	
-	
 	public int getAmount() {
 		return amount;
 	}
@@ -46,7 +44,21 @@ public class Customer {
 		this.ckeckRevieved = ckeckRevieved;
 	}
 
+	public String getName() {
+		return name;
+	}
 
+	public String getFirstname() {
+		return firstname;
+	}
+	
+	public ArrayList<Check> getCheckbook() {
+		return checkbook;
+	}
+
+	public int getIdBank() {
+		return idBank;
+	}
 
 	// Constructor
 	public Customer(String firstname, String name, int idBank, int id, int amount) {

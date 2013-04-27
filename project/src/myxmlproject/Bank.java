@@ -10,10 +10,16 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
+
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -97,15 +103,40 @@ public class Bank {
 
 	// Private methods
 	private int generateCustomerId() {
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		Double id = new Double(0);
+		try {
+			id = (Double) xpath.evaluate("/customerList/customer[last()]/idCustomer/text()", customerBase, XPathConstants.NUMBER);
+		} catch (XPathExpressionException e) {
+			e.printStackTrace();
+		}
 		// parcours de l'arbre et incrementer l'ID
-		return 0;
+		return id.intValue();
 	}
 	
 	private void addCustomerToBase(Customer c) {
-		// parse xml
-		// generer nell Id
-		// ajouter client
-		;
+		Element customer = customerBase.createElement("customer");
+		Element identite = customerBase.createElement("identite");
+		identite.setAttribute("firstname", c.getFirstname());
+		identite.setAttribute("name", c.getName());
+		Element idCustomer = customerBase.createElement("idCustomer");
+		Text texte = customerBase.createTextNode("" + c.getId());
+		idCustomer.appendChild(texte);
+		Element idBank = customerBase.createElement("idBank");
+		texte = customerBase.createTextNode("" + c.getIdBank());
+		idBank.appendChild(texte);
+		Element listCheck = customerBase.createElement("listCheck");
+		//for(Check ch: c.getCheckbook()) {
+		//	Element check = ch.createCheckNode();
+		//	customerBase.adoptNode(check);
+		//	listCheck.appendChild(check);
+		//}
+		customer.appendChild(identite);
+		customer.appendChild(idCustomer);
+		customer.appendChild(idBank);
+		customer.appendChild(listCheck);
+		customerBase.getDocumentElement().appendChild(customer);
+		writeXML();
 	}
 	
 	public void writeXML(){
