@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<xsd:include schemaLocation="check.xsd"></xsd:include>
+
+<xsd:element name="customerList">
+	<xsd:complexType>
+		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+			<xsd:element ref="customer"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:element name="customer">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element name="identity">
+				<xsd:complexType>
+					<xsd:attribute name="name"      type="xsd:string"/>
+					<xsd:attribute name="firstname" type="xsd:string"/>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="idCustomer" type="xsd:positiveInteger"/>
+			<xsd:element name="checkList">
+				<xsd:complexType>
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element ref="check"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+</xsd:schema>

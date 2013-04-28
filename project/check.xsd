@@ -16,6 +16,37 @@
 </xsd:simpleContent>
 </xsd:complexType>
 
+<xsd:simpleType name="typeDay">
+	<xsd:restriction base="xsd:positiveInteger">
+	<xsd:minInclusive value="1"/>
+	<xsd:maxInclusive value="31"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="typeMonth">
+	<xsd:restriction base="xsd:string">
+		<xsd:enumeration value="January"/>
+		<xsd:enumeration value="February"/>
+		<xsd:enumeration value="March"/>
+		<xsd:enumeration value="April"/>
+		<xsd:enumeration value="May"/>
+		<xsd:enumeration value="June"/>
+		<xsd:enumeration value="July"/>
+		<xsd:enumeration value="August"/>
+		<xsd:enumeration value="September"/>
+		<xsd:enumeration value="October"/>
+		<xsd:enumeration value="November"/>
+		<xsd:enumeration value="December"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="typeYear">
+	<xsd:restriction base="xsd:positiveInteger">
+	<xsd:minInclusive value="1970"/>
+	<xsd:maxInclusive value="2015"/>
+	</xsd:restriction>
+</xsd:simpleType>
+
 <xsd:element name="check">
 	<xsd:complexType>
 	<xsd:sequence>
@@ -25,9 +56,9 @@
 		<xsd:element name="amount"     type="typeAmount" minOccurs="0"/>
 		<xsd:element name="date" minOccurs="0">
 			<xsd:complexType>
-			 <xsd:attribute name="day"   type="typeDay"    use="required"/>
-			 <xsd:attribute name="month" type="typeMonth"  use="required"/>
-			 <xsd:attribute name="year"  type="typeYear"   use="required"/>
+				<xsd:attribute name="day"   type="typeDay"    use="required"/>
+				<xsd:attribute name="month" type="typeMonth"  use="required"/>
+				<xsd:attribute name="year"  type="typeYear"   use="required"/>
 			</xsd:complexType>
 		</xsd:element>
 	</xsd:sequence>

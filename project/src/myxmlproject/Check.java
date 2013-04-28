@@ -2,26 +2,31 @@ package myxmlproject;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import sun.util.calendar.BaseCalendar.Date;
 
 public class Check {
+	private static String PATH_TO_XSD = "check.xsd";
+	
 	public enum Currency {
 		Dollars, Euros
 	}
@@ -43,6 +48,8 @@ public class Check {
 		// Build xml DOM document
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			dbf.setFeature("http://apache.org/xml/features/validation/schema", true);
+			dbf.setNamespaceAware(true);
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			doc = db.newDocument();
 			Element root = createCheckNode();
@@ -55,6 +62,7 @@ public class Check {
 	public Element createCheckNode() {
 		Element root = doc.createElement("check");
 		// Attributes
+		root.setAttributeNS(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "noNamespaceSchemaLocation", PATH_TO_XSD);
 		HashMap<String, String> attrCurrency = new HashMap<String, String>();
 		attrCurrency.put("type", currency.name());
 		attrCurrency.put("type", currency.name());
@@ -91,7 +99,6 @@ public class Check {
 		try {
 			// write the content into xml file
 			Transformer tFormer = TransformerFactory.newInstance().newTransformer();
-			tFormer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "check.dtd");
 			DOMSource source = new DOMSource(doc);
 			StreamResult result = new StreamResult(new File("test.xml"));
 			// Output to console for testing

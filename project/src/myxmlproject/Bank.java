@@ -1,15 +1,19 @@
 package myxmlproject;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -20,16 +24,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
-
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 
 public class Bank {
-	static String baseDir = ".";
+	private static String PATH_TO_XSD = "customer-base.xsd";
+	private static String BASE_DIR    = ".";
 	
 	private int      id;
 	private String   name;
@@ -40,19 +40,20 @@ public class Bank {
 	public Bank(int id, String name) {
 		this.id = id;
 		this.name = name;
-		pathToBase = baseDir + "/customer-base_" + id + ".xml";
+		pathToBase = BASE_DIR + "/customer-base_" + id + ".xml";
 		File f = new File(pathToBase);
 		// Initialize parser
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
-			dbf.setFeature("http://xml.org/sax/features/validation", true);
+			dbf.setFeature("http://apache.org/xml/features/validation/schema", true);
 			dbf.setValidating(true);
 			dbf.setNamespaceAware(true);
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
 			if(! f.isFile()) {
 				customerBase = db.newDocument();
-				Element root = customerBase.createElement("customerList"); 
+				Element root = customerBase.createElement("customerList");
+				root.setAttributeNS(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "noNamespaceSchemaLocation", PATH_TO_XSD);
 				customerBase.appendChild(root);
 			} else {
 				customerBase = db.parse(f);
@@ -104,9 +105,11 @@ public class Bank {
 	// Private methods
 	private int generateCustomerId() {
 		XPath xpath = XPathFactory.newInstance().newXPath();
-		Double id = new Double(0);
+		Double id = null;
 		try {
 			id = (Double) xpath.evaluate("/customerList/customer[last()]/idCustomer/text()", customerBase, XPathConstants.NUMBER);
+			if(id.isNaN())
+				id = 1.0;
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		}
@@ -116,16 +119,13 @@ public class Bank {
 	
 	private void addCustomerToBase(Customer c) {
 		Element customer = customerBase.createElement("customer");
-		Element identite = customerBase.createElement("identite");
+		Element identite = customerBase.createElement("identity");
 		identite.setAttribute("firstname", c.getFirstname());
 		identite.setAttribute("name", c.getName());
 		Element idCustomer = customerBase.createElement("idCustomer");
 		Text texte = customerBase.createTextNode("" + c.getId());
 		idCustomer.appendChild(texte);
-		Element idBank = customerBase.createElement("idBank");
-		texte = customerBase.createTextNode("" + c.getIdBank());
-		idBank.appendChild(texte);
-		Element listCheck = customerBase.createElement("listCheck");
+		Element listCheck = customerBase.createElement("checkList");
 		//for(Check ch: c.getCheckbook()) {
 		//	Element check = ch.createCheckNode();
 		//	customerBase.adoptNode(check);
@@ -133,7 +133,6 @@ public class Bank {
 		//}
 		customer.appendChild(identite);
 		customer.appendChild(idCustomer);
-		customer.appendChild(idBank);
 		customer.appendChild(listCheck);
 		customerBase.getDocumentElement().appendChild(customer);
 		writeXML();
@@ -143,7 +142,7 @@ public class Bank {
 		try {
 			// write the content into xml file
 			Transformer tFormer = TransformerFactory.newInstance().newTransformer();
-			tFormer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "customer-base.dtd");
+			tFormer.setOutputProperty(OutputKeys.INDENT, "yes");
 			DOMSource source = new DOMSource(customerBase);
 			StreamResult result = new StreamResult(new File(pathToBase));
 			// Output to console for testing
