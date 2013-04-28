@@ -37,7 +37,11 @@ public class Customer {
 	private ArrayList<Check> checkbook;
 	private ArrayList<Product> cart;
 	private ArrayList<Check> ckeckRevieved;
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> 74bb2124dbc26ac57028f027321454b39d7f3022
 	public int getAmount() {
 		return amount;
 	}
@@ -62,6 +66,25 @@ public class Customer {
 		this.ckeckRevieved = ckeckRevieved;
 	}
 
+<<<<<<< HEAD
+=======
+	public String getName() {
+		return name;
+	}
+
+	public String getFirstname() {
+		return firstname;
+	}
+	
+	public ArrayList<Check> getCheckbook() {
+		return checkbook;
+	}
+
+	public int getIdBank() {
+		return idBank;
+	}
+
+>>>>>>> 74bb2124dbc26ac57028f027321454b39d7f3022
 	// Constructor
 	public Customer(String firstname, String name, int idBank, int id,
 			int amount) {

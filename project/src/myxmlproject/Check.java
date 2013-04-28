@@ -45,20 +45,25 @@ public class Check {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			doc = db.newDocument();
-			Element root = doc.createElement("check");
+			Element root = createCheckNode();
 			doc.appendChild(root);
-			// Attributes
-			HashMap<String, String> attrCurrency = new HashMap<String, String>();
-			attrCurrency.put("type", currency.name());
-			attrCurrency.put("type", currency.name());
-			// Elements
-			addElement("idCheck"   , root, "" + id, null);
-			addElement("idBank"    , root, "" + idBank, null);
-			addElement("idCustomer", root, "" + idCustomer, null);
-			addElement("currency"  , root, "", attrCurrency);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Element createCheckNode() {
+		Element root = doc.createElement("check");
+		// Attributes
+		HashMap<String, String> attrCurrency = new HashMap<String, String>();
+		attrCurrency.put("type", currency.name());
+		attrCurrency.put("type", currency.name());
+		// Elements
+		addElement("idCheck"   , root, "" + id, null);
+		addElement("idBank"    , root, "" + idBank, null);
+		addElement("idCustomer", root, "" + idCustomer, null);
+		addElement("currency"  , root, "", attrCurrency);
+		return root;
 	}
 	
 	// Getters and setters
