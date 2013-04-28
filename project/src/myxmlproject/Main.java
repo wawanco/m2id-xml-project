@@ -14,10 +14,14 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.TransformerConfigurationException;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import sun.util.calendar.BaseCalendar;
+import sun.util.calendar.BaseCalendar.*;
 
 public class Main {
 	
@@ -182,7 +186,24 @@ public class Main {
 					selection = Integer.parseInt(stdinp.readLine());
 					order.addProduct(product, quantity);
 				}
-				System.out.println("The total of your order is :" + order.calculateSum());
+				System.out.println("The total of your order is : " + order.calculateSum() + " euros.");
+				System.out.println("If you want to validate your command and write a check, please type 1. If you want to cancel your command, please type 2. ");
+				selection = Integer.parseInt(stdinp.readLine());
+				if (selection == 1){
+					
+					BaseCalendar.Date date;
+						try {
+							date = BaseCalendar.Date.class.newInstance();
+							date.setDate(2013, 4, 28);
+							c.fillCheck(order.calculateSum(),date);
+						} 	catch (TransformerConfigurationException e) {
+							e.printStackTrace();
+						}	catch (InstantiationException e) {
+							e.printStackTrace();
+						} 	catch (IllegalAccessException e) {
+							e.printStackTrace();
+						}	
+			}
 			} else if (input.equals("No")) {
 				System.out.println("Customer already exists");
 			}
