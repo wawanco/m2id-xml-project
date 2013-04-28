@@ -1,50 +1,44 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?xml-stylesheet type="text/xsl" href="client.xsl"?>
-<!DOCTYPE customerList SYSTEM "customer-base.dtd" >
-<customerList>
+
+<customerList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="customer-base.xsd">
 	<customer>
-		<identite firstname="Jean" name="Dupond" />
+		<identity firstname="Jean" name="Dupond" />
 		<idCustomer>1</idCustomer>
-		<idBank>1</idBank>
-		<listCheck>
+		<checkList>
 			<check>
 				<idCheck>1</idCheck>
 				<idBank>1</idBank>
 				<idCustomer>1</idCustomer>
-				<amount>5</amount>
+				<amount currency="euros">5</amount>
 				<date day="3" year="2012" month="January"/>
-				<currency type="euros"/>
 			</check>
-		</listCheck>
+		</checkList>
 	</customer>
 	<customer>
-		<identite firstname="Marie" name="Dupond" />
+		<identity firstname="Marie" name="Dupond" />
 		<idCustomer>2</idCustomer>
-		<idBank>1</idBank>
-		<listCheck>
+		<checkList>
 			<check>
 				<idCheck>1</idCheck>
 				<idBank>1</idBank>
 				<idCustomer>2</idCustomer>
-				<amount>3</amount>
+				<amount currency="dollars">3</amount>
 				<date day="2" year="2012" month="January"/>
-				<currency type="dollars"/>
 			</check>
-		</listCheck>
+		</checkList>
 	</customer>
 	<customer>
-		<identite firstname="Robert" name="DeNiro" />
-		<idCustomer>2</idCustomer>
-		<idBank>2</idBank>
-		<listCheck>
+		<identity firstname="Robert" name="DeNiro" />
+		<idCustomer>3</idCustomer>
+		<checkList>
 			<check>
 				<idCheck>1</idCheck>
 				<idBank>2</idBank>
-				<idCustomer>2</idCustomer>
-				<amount>3</amount>
+				<idCustomer>3</idCustomer>
+				<amount currency="dollars">3</amount>
 				<date day="2" year="2012" month="January"/>
-				<currency type="dollars"/>
 			</check>
-		</listCheck>
+		</checkList>
 	</customer>
 </customerList>
