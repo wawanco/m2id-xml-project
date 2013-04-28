@@ -12,6 +12,14 @@ public class Product {
 		this.unitPrice = unitPrice;
 	}
 
+	public int getStock() {
+		return stock;
+	}
+
+	public void setStock(int stock) {
+		this.stock = stock;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -27,7 +35,7 @@ public class Product {
 	public void setUnitPrice(float unitPrice) {
 		this.unitPrice = unitPrice;
 	}
-	
+
 	public Product clone() {
 		return new Product(name, stock, unitPrice);
 	}
