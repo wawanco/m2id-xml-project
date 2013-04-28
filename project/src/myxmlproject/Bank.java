@@ -77,13 +77,13 @@ public class Bank {
 	}
 	
 	// Public methods
-	public Customer registerCustomer(String firstname, String name, int amount){
+	public Customer registerCustomer(String firstname, String name, int deposit){
+		//TODO gerer le deposit
 		Customer customer = new Customer(
 				firstname
 			,	name
 			, 	id
 			, 	generateCustomerId()
-			, 	amount
 			);
 		addCustomerToBase(customer);
 		return customer;

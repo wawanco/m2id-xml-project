@@ -136,9 +136,7 @@ public class Company {
 							if (eElement.getAttribute("type") == this.currency) {
 								// test stock
 								for (int i = 0; i < productList.size(); i++) {
-									if (sumProductQuantity.get(productList
-											.get(i)) <= productList.get(i)
-											.getStock()) {
+									if (sumProductQuantity.get(productList.get(i)) <= productList.get(i).getStock()) {
 										validate = true;
 									}
 								}

@@ -19,6 +19,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import sun.util.calendar.BaseCalendar.Date;
@@ -32,23 +33,9 @@ public class Customer {
 	private int idBank;
 	private String name;
 	private String firstname;
-	private int amount;
 	private String directory;
 	private ArrayList<Check> checkbook;
 	private ArrayList<Product> cart;
-	private ArrayList<Check> ckeckRevieved;
-<<<<<<< HEAD
-
-=======
-	
->>>>>>> 74bb2124dbc26ac57028f027321454b39d7f3022
-	public int getAmount() {
-		return amount;
-	}
-
-	public void setAmount(int amount) {
-		this.amount = amount;
-	}
 
 	public ArrayList<Product> getCart() {
 		return cart;
@@ -58,16 +45,6 @@ public class Customer {
 		this.cart = cart;
 	}
 
-	public ArrayList<Check> getCkeckRevieved() {
-		return ckeckRevieved;
-	}
-
-	public void setCkeckRevieved(ArrayList<Check> ckeckRevieved) {
-		this.ckeckRevieved = ckeckRevieved;
-	}
-
-<<<<<<< HEAD
-=======
 	public String getName() {
 		return name;
 	}
@@ -84,15 +61,12 @@ public class Customer {
 		return idBank;
 	}
 
->>>>>>> 74bb2124dbc26ac57028f027321454b39d7f3022
 	// Constructor
-	public Customer(String firstname, String name, int idBank, int id,
-			int amount) {
+	public Customer(String firstname, String name, int idBank, int id) {
 		this.firstname = firstname;
 		this.name = name;
 		this.idBank = idBank;
 		this.id = id;
-		this.amount = amount;
 		directory = "./Customer_" + id;
 		File dir = new File(directory);
 		dir.mkdir();
@@ -108,56 +82,49 @@ public class Customer {
 	}
 
 	// Public methods
-	public void fillCheck(int money, Date when) throws IOException,
-			TransformerConfigurationException {
+	public void fillCheck(int amount, Date date) throws IOException, TransformerConfigurationException {
 		// Customer will use this function to fill the amount and date of a
 		// check
-		if (amount != 0 && when != null) {
-			throw new Error("Invalid amount or date.");
-		}
 		try {
-
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder docBuilder;
-			try {
-				docBuilder = docFactory.newDocumentBuilder();
-				Document doc = docBuilder.parse("/project/check.xml");
-				Node date = doc.getFirstChild();
-				NamedNodeMap dateAttributes = date.getAttributes();
-				Attr day = doc.createAttribute("day");
-				day.setValue(Integer.toString(when.getDayOfMonth()));
-				dateAttributes.setNamedItem(day);
-
-				Attr month = doc.createAttribute("month");
-				month.setValue(Integer.toString(when.getMonth()));
-				dateAttributes.setNamedItem(month);
-
-				Attr year = doc.createAttribute("year");
-				year.setValue(Integer.toString(when.getYear()));
-				dateAttributes.setNamedItem(year);
-
-				Node amount = doc.createElement("amount");
-				amount.setTextContent(Integer.toString(money));
-				date.appendChild(amount);
-
-				TransformerFactory transformerFactory = TransformerFactory
-						.newInstance();
-				Transformer transformer = transformerFactory.newTransformer();
-				DOMSource source = new DOMSource(doc);
-				StreamResult result = new StreamResult(new File(
-						"/project/mailBox/check.xml"));
-				try {
-					transformer.transform(source, result);
-				} catch (TransformerException e) {
-					e.printStackTrace();
-				}
-			} catch (ParserConfigurationException e2) {
-				e2.printStackTrace();
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db;
+			db = dbf.newDocumentBuilder();
+			// TODO donner la vrai adresse du check
+			Document doc = db.parse("/project/check.xml");
+			// On remplit le montant
+			NodeList amountList = doc.getDocumentElement().getElementsByTagName("amount");
+			Element eAmount;
+			if(amountList == null) {
+				eAmount = doc.createElement("amount");
+				doc.getDocumentElement().appendChild(eAmount);
+			} else {
+				eAmount = ((Element) amountList.item(0));
 			}
-
-		} catch (SAXException e1) {
-			e1.printStackTrace();
+			eAmount.appendChild(doc.createTextNode(Integer.toString(amount)));
+			// On remplit la date
+			NodeList dateList = doc.getDocumentElement().getElementsByTagName("date");
+			Element eDate;
+			if(dateList == null) {
+				eDate = doc.createElement("date");
+				doc.getDocumentElement().appendChild(eDate);
+			} else {
+				eDate = ((Element) dateList.item(0));
+			}
+			eDate.setAttribute("day"  , Integer.toString(date.getDayOfMonth()));
+			eDate.setAttribute("month", Integer.toString(date.getMonth()));
+			eDate.setAttribute("year" , Integer.toString(date.getYear()));
+			// Ecrire le nouveau xml
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File("/project/mailBox/check.xml"));
+			transformer.transform(source, result);
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
 		}
 
 		// delete last check
@@ -170,8 +137,7 @@ public class Customer {
 	}
 
 	public String toString() {
-		return "Customer name: " + name + "Customer surname: " + firstname
-				+ "with customer id " + id + "Bank id" + idBank;
+		return "Customer name: " + name + "Customer surname: " + firstname + "with customer id " + id + "Bank id" + idBank;
 	}
 
 }
