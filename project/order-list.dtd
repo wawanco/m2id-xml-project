@@ -4,15 +4,17 @@
 <!ELEMENT id (#PCDATA)>
 <!ELEMENT customer (identite?, idCustomer, idBank?, cart)>
 <!ELEMENT identite EMPTY>
-<!ATTLIST identite name CDATA #REQUIRED
-					firstname CDATA #REQUIRED>
+<!ATTLIST identite 
+	name      CDATA #REQUIRED 
+	firstname CDATA #REQUIRED
+>
 <!ELEMENT idCustomer (#PCDATA)>
 <!ELEMENT idBank (#PCDATA)>
 <!ELEMENT cart (product)+>
 <!ELEMENT product (id, name, unitPrice, currency)>
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT unitPrice (#PCDATA)>
-<!ELEMENT currency (#PCDATA)>
+<!ELEMENT currency EMPTY>
 <!ATTLIST currency type (euros|dollars) "euros">
 <!ELEMENT company (id, name, idBank)>
 
