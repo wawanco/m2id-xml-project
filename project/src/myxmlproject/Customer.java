@@ -64,9 +64,9 @@ public class Customer {
 		this.name = name;
 		this.idBank = idBank;
 		this.id = id;
-		directory = "./Customer_" + id;
+		directory = "./Bank_" + idBank + "/Customer_" + id;
 		File dir = new File(directory);
-		dir.mkdir();
+		dir.mkdirs();
 	}
 
 	// Getters and setters

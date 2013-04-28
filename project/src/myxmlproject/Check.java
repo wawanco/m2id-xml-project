@@ -8,6 +8,7 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -99,8 +100,9 @@ public class Check {
 		try {
 			// write the content into xml file
 			Transformer tFormer = TransformerFactory.newInstance().newTransformer();
+			tFormer.setOutputProperty(OutputKeys.INDENT, "yes");
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File("test.xml"));
+			StreamResult result = new StreamResult(new File(path + "/check_" + id + ".xml"));
 			// Output to console for testing
 			//StreamResult result = new StreamResult(System.out);
 			tFormer.transform(source, result);

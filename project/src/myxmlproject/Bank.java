@@ -89,13 +89,14 @@ public class Bank {
 	}
 	
 	public void generateChecks(Customer c, int nbEuros, int nbDollars) {
+		int checkId = 1;
 		for(int i = 0; i < nbEuros; i++) {
-			Check check = new Check(0, id, c.getId(), Check.Currency.Euros);
+			Check check = new Check(checkId++, id, c.getId(), Check.Currency.Euros);
 			check.createXml(c.getDirectory());
 		}
 		
 		for(int i = 0; i < nbDollars; i++) {
-			Check check = new Check(0, id, c.getId(), Check.Currency.Dollars);
+			Check check = new Check(checkId++, id, c.getId(), Check.Currency.Dollars);
 			check.createXml(c.getDirectory());
 		}
 	}
