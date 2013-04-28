@@ -79,7 +79,7 @@ public class Customer {
 	}
 
 	// Public methods
-	public void fillCheck(int amount, Date date) throws IOException, TransformerConfigurationException {
+	public void fillCheck(double amount, Date date) throws IOException, TransformerConfigurationException {
 		// Customer will use this function to fill the amount and date of a
 		// check
 		try {
@@ -97,7 +97,7 @@ public class Customer {
 			} else {
 				eAmount = ((Element) amountList.item(0));
 			}
-			eAmount.appendChild(doc.createTextNode(Integer.toString(amount)));
+			eAmount.appendChild(doc.createTextNode(Double.toString(amount)));
 			// On remplit la date
 			NodeList dateList = doc.getDocumentElement().getElementsByTagName("date");
 			Element eDate;

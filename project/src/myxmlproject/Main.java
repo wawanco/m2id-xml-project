@@ -8,9 +8,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -205,9 +202,9 @@ public class Main {
 					System.out.println("The total price of your selection is "
 							+ totalPrice + " "
 							+ companies.get(idCompany).getCurrency());
-					System.out.println("If you want to validate your command, please type 1. "
-									+ "If you want to cancel your command, please type 2."
-									+ "If you want to buy another product, please type 3");
+					System.out.println("If you want to validate your command, please type 1.");
+					System.out.println("If you want to cancel your command, please type 2.");
+					System.out.println("If you want to buy another product, please type 3");
 					selection = Integer.parseInt(stdinp.readLine());
 					if (selection == 1){
 						order.addProduct(product, quantity);

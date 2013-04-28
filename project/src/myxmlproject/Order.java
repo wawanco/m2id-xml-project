@@ -1,43 +1,35 @@
 package myxmlproject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Order {
 
 	private int id;
 	private int idCustomer;
-	private ArrayList<Product> cart;
-	private ArrayList<Integer> quantities;
+	private HashMap<Product, Integer> cart;
 	private String companyName;
 	private int idCompany;
 	private int idCompanyBank;
 	private int orderSum = 0;
 
 	public Order(int id, int idCustomer, int idCompany) {
-
 		this.id = id;
 		this.idCompany = idCompany;
 		this.idCustomer = idCustomer;
+		cart = new HashMap<Product, Integer>();
 	}
 
-	public void addProduct(Product product, int quantity) {
-		if (cart.contains(product)) {
-			for (int i = 0; i < cart.size(); i++) {
-				if (cart.get(i) == product) {
-					this.quantities.set(i, this.quantities.get(i) + quantity);
-				}
-			}
+	public void addProduct(Product p, int quantity) {
+		if(cart.containsKey(p)) {
+			cart.put(p, cart.get(p) + quantity);
 		} else {
-			for (int i = 0; i < cart.size(); i++) {
-				if (cart.get(i).equals(null)) {
-					cart.set(i, product);
-					this.quantities.set(i, quantity);
-				}
-			}
+			cart.put(p, quantity);			
 		}
 	}
 
+	/*
 	public void removeProduct(Product product) {
 		for (int i = 0; i < cart.size(); i++) {
 			if (cart.get(i).equals(product)) {
@@ -46,11 +38,13 @@ public class Order {
 			}
 		}
 	}
+	*/
 
-	public int calculateSum() {
-		for (int i = 1; i < cart.size(); i++) {
-			orderSum += quantities.get(i) * cart.get(i).getUnitPrice();
+	public double calculateSum() {
+		double sum = 0;
+		for (Map.Entry<Product, Integer> e: cart.entrySet()) {
+			sum += e.getKey().getUnitPrice() * e.getValue();
 		}
-		return orderSum;
+		return sum;
 	}
 }
