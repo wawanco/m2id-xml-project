@@ -84,22 +84,71 @@ public class Main {
 		}
 	}
 	
-
+	private static Customer getInformationFromExistingCustomer() {
+		try {
+			BufferedReader stdinp = new BufferedReader(new InputStreamReader(System.in));
+			System.out.println("To which bank have been registered?");
+			for(int i = 0; i < bankObj.length; i++) {
+				System.out.println("Type " + i + " for " + bankObj[i].getName() + ".");
+			}
+			int idBank = Integer.parseInt(stdinp.readLine());
+			System.out.println("What is your identification number?");
+			int id = Integer.parseInt(stdinp.readLine());
+			Customer customer = bankObj[idBank].retrieveCustomer(id);
+			while(customer == null){
+				System.out.println("Your id has not been found, try it again..");
+				id = Integer.parseInt(stdinp.readLine());
+				customer = bankObj[idBank].retrieveCustomer(id);
+			}
+			System.out.println("Hello " + customer.getFirstname() + " " + customer.getName() + "!");
+			return customer;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private static Customer getInformationFromNewCustomer() {
+		try {
+			BufferedReader stdinp = new BufferedReader(new InputStreamReader(System.in));
+			System.out.println("Please, choose your bank.");
+			for(int i = 0; i < bankObj.length; i++) {
+				System.out.println("Type " + i + " for " + bankObj[i].getName() + ".");
+			}
+			int idBank = Integer.parseInt(stdinp.readLine());
+			System.out.println("Please type your name.");
+			String name = stdinp.readLine();
+			System.out.println("Please type your firstname.");
+			String firstname = stdinp.readLine();
+			System.out.println("How much money do you want to deposit on your account (in Euros)?");
+			int amount = Integer.parseInt(stdinp.readLine());
+			Customer newCustomer = bankObj[idBank].registerCustomer(firstname, name, amount);
+			System.out.println("Thank you. You have been registered.");
+			System.out.println("How many checks do you want :");
+			System.out.println("In Euros ?");
+			int nbEuros = Integer.parseInt(stdinp.readLine());
+			System.out.println("In Dollars ?");
+			int nbDollars = Integer.parseInt(stdinp.readLine());
+			bankObj[idBank].generateChecks(newCustomer, nbEuros, nbDollars);
+			System.out.println("Your " + (nbDollars + nbEuros) + " check have been generated in your customer directory:");
+			System.out.println("--> " + newCustomer.getDirectory());
+			return newCustomer;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	// banks
-	private static HashMap<Integer, String> banks = new HashMap<Integer, String>();
-	static {
-		banks.put(0, "LCL");
-		banks.put(1, "BNP");
-		banks.put(2, "Société Générale");
-	}
+	//private static HashMap<Integer, String> banks = new HashMap<Integer, String>();
+	private static final String[] banks   = {"LCL", "BNP", "Société Générale"};
+	private static Bank[] bankObj = new Bank[banks.length];
 
 	private static ArrayList<Company> companies;
 
 	public static void main(String[] args) {
 
 		// Initializing
-		HashMap<Integer, Bank> bankObj = new HashMap<Integer, Bank>();
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		try {
 			spf.setFeature("http://xml.org/sax/features/validation", true);
@@ -119,43 +168,19 @@ public class Main {
 		}
 
 		BufferedReader stdinp = new BufferedReader(new InputStreamReader(System.in));
-		Iterator it = banks.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry me = (Map.Entry) it.next();
-			int id = (Integer) me.getKey();
-			String name = (String) me.getValue();
-			bankObj.put(id, new Bank(id, name));
+		for(int i = 0; i < banks.length; i++) {
+			bankObj[i] = new Bank(i, banks[i]);
 		}
 
 		System.out.println("Welcome. Are you a new customer? Yes/No");
 		try {
 			String input = stdinp.readLine();
-			if (input.equals("Yes")) {
-				System.out.println("Please, choose your bank.");
-				it = bankObj.entrySet().iterator();
-				while (it.hasNext()) {
-					Map.Entry me = (Map.Entry) it.next();
-					int id = ((Bank) me.getValue()).getId();
-					String name = ((Bank) me.getValue()).getName();
-					System.out.println("Type " + id + " for " + name + ".");
-				}
-				int idBank = Integer.parseInt(stdinp.readLine());
-				System.out.println("Please type your name.");
-				String name = stdinp.readLine();
-				System.out.println("Please type your firstname.");
-				String firstname = stdinp.readLine();
-				System.out.println("How much money do you want to deposit on your account (in Euros)?");
-				int amount = Integer.parseInt(stdinp.readLine());
-				Customer c = bankObj.get(idBank).registerCustomer(firstname, name, amount);
-				System.out.println("Thank you. You have been registered.");
-				System.out.println("How many checks do you want :");
-				System.out.println("In Euros ?");
-				int nbEuros = Integer.parseInt(stdinp.readLine());
-				System.out.println("In Dollars ?");
-				int nbDollars = Integer.parseInt(stdinp.readLine());
-				bankObj.get(idBank).generateChecks(c, nbEuros, nbDollars);
-				System.out.println("Your " + (nbDollars + nbEuros) + " check have been generated in your customer directory:");
-				System.out.println("--> " + c.getDirectory());
+			Customer customer = null;
+			if (input.substring(0,1).equalsIgnoreCase("y")) {
+				customer = getInformationFromNewCustomer();
+			} else {
+				customer = getInformationFromExistingCustomer();
+			}
 				// Choisir entreprise-produit
 				System.out.println("Please choose the company you wish from the list below: ");
 				for (int i = 0; i < companies.size(); i++) {
@@ -197,7 +222,7 @@ public class Main {
 						try {
 							date = BaseCalendar.Date.class.newInstance();
 							date.setDate(2013, 4, 28);
-							c.fillCheck(order.calculateSum(),date);
+							customer.fillCheck(order.calculateSum(),date);
 						} 	catch (TransformerConfigurationException e) {
 							e.printStackTrace();
 						}	catch (InstantiationException e) {
@@ -205,9 +230,6 @@ public class Main {
 						} 	catch (IllegalAccessException e) {
 							e.printStackTrace();
 						}	
-			}
-			} else if (input.equals("No")) {
-				System.out.println("Customer already exists");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

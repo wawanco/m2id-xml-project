@@ -5,15 +5,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -21,6 +18,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
@@ -81,11 +79,11 @@ public class Bank {
 	public Customer registerCustomer(String firstname, String name, int deposit){
 		//TODO gerer le deposit
 		Customer customer = new Customer(
-				firstname
-			,	name
-			, 	id
-			, 	generateCustomerId()
-			);
+			firstname
+		,	name
+		, 	id
+		, 	generateCustomerId()
+		);
 		addCustomerToBase(customer);
 		return customer;
 	}
@@ -102,19 +100,38 @@ public class Bank {
 		}
 	}
 
+	public Customer retrieveCustomer(int idCustomer){
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		try {
+			String expr = "/customerList/customer[idCustomer = '" + idCustomer + "']";
+			Node res = (Node) xpath.evaluate(expr, customerBase, XPathConstants.NODE);
+			Element eIdentity = (Element) ((Element) res).getElementsByTagName("identity").item(0);
+			Customer customer = new Customer(
+					eIdentity.getAttribute("firstname")
+				,	eIdentity.getAttribute("name")
+				, 	id
+				, 	idCustomer
+				);
+			return customer;
+		} catch (XPathExpressionException e) {
+			return null;
+		}
+	}
+	
 	// Private methods
 	private int generateCustomerId() {
+		// Cherche le dernier client dans la base et incremente l'id.
 		XPath xpath = XPathFactory.newInstance().newXPath();
-		Double id = null;
+		Double dId = null;
 		try {
-			id = (Double) xpath.evaluate("/customerList/customer[last()]/idCustomer/text()", customerBase, XPathConstants.NUMBER);
-			if(id.isNaN())
-				id = 1.0;
+			dId = (Double) xpath.evaluate("/customerList/customer[last()]/idCustomer/text()", customerBase, XPathConstants.NUMBER);
+			if(dId.isNaN())
+				dId = 0.0;
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		}
-		// parcours de l'arbre et incrementer l'ID
-		return id.intValue();
+		int id = dId.intValue();
+		return ++id;
 	}
 	
 	private void addCustomerToBase(Customer c) {
