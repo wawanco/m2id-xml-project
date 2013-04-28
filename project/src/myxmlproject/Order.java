@@ -20,6 +20,10 @@ public class Order {
 		this.idCustomer = idCustomer;
 		cart = new HashMap<Product, Integer>();
 	}
+	
+	public int getIdCompany() {
+		return idCompany;
+	}
 
 	public void addProduct(Product p, int quantity) {
 		if(cart.containsKey(p)) {
