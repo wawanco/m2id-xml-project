@@ -3,6 +3,10 @@ package myxmlproject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.text.DateFormatSymbols;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,8 +22,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import sun.util.calendar.BaseCalendar.Date;
 
 public class Customer {
 	// 1. Choisir le GdC (getter/setter idBank?)
@@ -79,7 +81,7 @@ public class Customer {
 	}
 
 	// Public methods
-	public void fillCheck(double amount, Date date) throws IOException, TransformerConfigurationException {
+	public void fillCheck(double amount, Date date) {
 		// Customer will use this function to fill the amount and date of a
 		// check
 		try {
@@ -107,9 +109,11 @@ public class Customer {
 			} else {
 				eDate = ((Element) dateList.item(0));
 			}
-			eDate.setAttribute("day"  , Integer.toString(date.getDayOfMonth()));
-			eDate.setAttribute("month", Integer.toString(date.getMonth()));
-			eDate.setAttribute("year" , Integer.toString(date.getYear()));
+			GregorianCalendar calendar = new GregorianCalendar();
+			calendar.setTime(date);
+			eDate.setAttribute("day"  , "" + calendar.get(Calendar.DAY_OF_MONTH));
+			eDate.setAttribute("month", new DateFormatSymbols().getMonths()[calendar.get(Calendar.MONTH) - 1]);
+			eDate.setAttribute("year" , "" + calendar.get(Calendar.YEAR));
 			// Ecrire le nouveau xml
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
@@ -121,6 +125,9 @@ public class Customer {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
