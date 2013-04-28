@@ -33,6 +33,15 @@ public class Customer {
 	private String directory;
 	private ArrayList<Check> checkbook;
 	private ArrayList<Product> cart;
+	private int amount;
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
 
 	public ArrayList<Product> getCart() {
 		return cart;
