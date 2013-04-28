@@ -159,6 +159,7 @@ public class Main {
 				}
 				int idCompany = Integer.parseInt(stdinp.readLine());
 				int selection = 3;
+				Order order = new Order(1,1,idCompany);
 				while (selection == 3) {
 					Company chosenCpny = companies.get(idCompany);
 					System.out.println("Please choose a product from the list below: ");
@@ -179,7 +180,9 @@ public class Main {
 									+ "If you want to cancel your command, please type 2."
 									+ "If you want to buy another product, please type 3");
 					selection = Integer.parseInt(stdinp.readLine());
+					order.addProduct(product, quantity);
 				}
+				System.out.println("The total of your order is :" + order.calculateSum());
 			} else if (input.equals("No")) {
 				System.out.println("Customer already exists");
 			}
