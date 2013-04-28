@@ -14,11 +14,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -124,14 +121,6 @@ public class Customer {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
-			e.printStackTrace();
-		}
-
-		// delete last check
-		try {
-			File file = new File("/project/check.xml");
-			file.delete();
-		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
