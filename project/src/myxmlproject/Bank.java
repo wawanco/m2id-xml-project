@@ -1,5 +1,7 @@
 package myxmlproject;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -19,21 +21,27 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Bank {
 	private static String PATH_TO_XSD = "customer-base.xsd";
-	private static String BASE_DIR    = ".";
-	
-	private int      id;
-	private String   name;
-	private String   pathToBase;
+	private static String BASE_DIR = ".";
+
+	private int id;
+	private String name;
+	private String pathToBase;
 	private Document customerBase;
-	
+
 	// Construtor
 	public Bank(int id, String name) {
 		this.id = id;
@@ -43,15 +51,18 @@ public class Bank {
 		// Initialize parser
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
-			dbf.setFeature("http://apache.org/xml/features/validation/schema", true);
+			dbf.setFeature("http://apache.org/xml/features/validation/schema",
+					true);
 			dbf.setValidating(true);
 			dbf.setNamespaceAware(true);
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
-			if(! f.isFile()) {
+			if (!f.isFile()) {
 				customerBase = db.newDocument();
 				Element root = customerBase.createElement("customerList");
-				root.setAttributeNS(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "noNamespaceSchemaLocation", PATH_TO_XSD);
+				root.setAttributeNS(
+						XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI,
+						"noNamespaceSchemaLocation", PATH_TO_XSD);
 				customerBase.appendChild(root);
 			} else {
 				customerBase = db.parse(f);
@@ -65,7 +76,7 @@ public class Bank {
 		}
 		writeXML();
 	}
-	
+
 	// Getters and setters
 	public int getId() {
 		return id;
@@ -74,59 +85,59 @@ public class Bank {
 	public String getName() {
 		return name;
 	}
-	
+
 	// Public methods
-	public Customer registerCustomer(String firstname, String name, int deposit){
-		//TODO gerer le deposit
-		Customer customer = new Customer(
-			firstname
-		,	name
-		, 	id
-		, 	generateCustomerId()
-		);
+	public Customer registerCustomer(String firstname, String name, int deposit) {
+		// TODO gerer le deposit
+		Customer customer = new Customer(firstname, name, id,
+				generateCustomerId());
 		addCustomerToBase(customer);
 		return customer;
 	}
-	
+
 	public void generateChecks(Customer c, int nbEuros, int nbDollars) {
 		int checkId = 1;
-		for(int i = 0; i < nbEuros; i++) {
-			Check check = new Check(checkId++, id, c.getId(), Check.Currency.Euros);
+		for (int i = 0; i < nbEuros; i++) {
+			Check check = new Check(checkId++, id, c.getId(),
+					Check.Currency.Euros);
 			check.createXml(c.getDirectory());
 		}
-		
-		for(int i = 0; i < nbDollars; i++) {
-			Check check = new Check(checkId++, id, c.getId(), Check.Currency.Dollars);
+
+		for (int i = 0; i < nbDollars; i++) {
+			Check check = new Check(checkId++, id, c.getId(),
+					Check.Currency.Dollars);
 			check.createXml(c.getDirectory());
 		}
 	}
 
-	public Customer retrieveCustomer(int idCustomer){
+	public Customer retrieveCustomer(int idCustomer) {
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		try {
-			String expr = "/customerList/customer[idCustomer = '" + idCustomer + "']";
-			Node res = (Node) xpath.evaluate(expr, customerBase, XPathConstants.NODE);
-			Element eIdentity = (Element) ((Element) res).getElementsByTagName("identity").item(0);
+			String expr = "/customerList/customer[idCustomer = '" + idCustomer
+					+ "']";
+			Node res = (Node) xpath.evaluate(expr, customerBase,
+					XPathConstants.NODE);
+			Element eIdentity = (Element) ((Element) res).getElementsByTagName(
+					"identity").item(0);
 			Customer customer = new Customer(
-					eIdentity.getAttribute("firstname")
-				,	eIdentity.getAttribute("name")
-				, 	id
-				, 	idCustomer
-				);
+					eIdentity.getAttribute("firstname"),
+					eIdentity.getAttribute("name"), id, idCustomer);
 			return customer;
 		} catch (XPathExpressionException e) {
 			return null;
 		}
 	}
-	
+
 	// Private methods
 	private int generateCustomerId() {
 		// Cherche le dernier client dans la base et incremente l'id.
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		Double dId = null;
 		try {
-			dId = (Double) xpath.evaluate("/customerList/customer[last()]/idCustomer/text()", customerBase, XPathConstants.NUMBER);
-			if(dId.isNaN())
+			dId = (Double) xpath.evaluate(
+					"/customerList/customer[last()]/idCustomer/text()",
+					customerBase, XPathConstants.NUMBER);
+			if (dId.isNaN())
 				dId = 0.0;
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
@@ -134,7 +145,7 @@ public class Bank {
 		int id = dId.intValue();
 		return ++id;
 	}
-	
+
 	private void addCustomerToBase(Customer c) {
 		Element customer = customerBase.createElement("customer");
 		Element identite = customerBase.createElement("identity");
@@ -144,22 +155,23 @@ public class Bank {
 		Text texte = customerBase.createTextNode("" + c.getId());
 		idCustomer.appendChild(texte);
 		Element listCheck = customerBase.createElement("checkList");
-		//for(Check ch: c.getCheckbook()) {
-		//	Element check = ch.createCheckNode();
-		//	customerBase.adoptNode(check);
-		//	listCheck.appendChild(check);
-		//}
+		// for(Check ch: c.getCheckbook()) {
+		// Element check = ch.createCheckNode();
+		// customerBase.adoptNode(check);
+		// listCheck.appendChild(check);
+		// }
 		customer.appendChild(identite);
 		customer.appendChild(idCustomer);
 		customer.appendChild(listCheck);
 		customerBase.getDocumentElement().appendChild(customer);
 		writeXML();
 	}
-	
-	public void writeXML(){
+
+	public void writeXML() {
 		try {
 			// write the content into xml file
-			Transformer tFormer = TransformerFactory.newInstance().newTransformer();
+			Transformer tFormer = TransformerFactory.newInstance()
+					.newTransformer();
 			tFormer.setOutputProperty(OutputKeys.INDENT, "yes");
 			DOMSource source = new DOMSource(customerBase);
 			StreamResult result = new StreamResult(new File(pathToBase));
@@ -170,7 +182,158 @@ public class Bank {
 		} catch (TransformerException e) {
 			e.printStackTrace();
 		}
- 	}
+	}
 
+	public void demandChecks() {
+		File fXmlFile = new File("/project/BankMailBox/check.xml");
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder;
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fXmlFile);
+			doc.getDocumentElement().normalize();
+			NodeList nList = doc.getElementsByTagName("check");
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				Node nNode = nList.item(temp);
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElement = (Element) nNode;
+					int idBank = Integer.parseInt(eElement
+							.getElementsByTagName("idBank").item(0)
+							.getTextContent());
+					Path source = Paths.get("/project/BankMailBox/check.xml");
+					// if idBank==0
+					Path dest = Paths.get("/project/MailBoxLCL/check.xml");
+					if (idBank == 1) {
+						dest = Paths.get("/project/MailBoxBNP/check.xml");
+					} else if (idBank == 2) {
+						dest = Paths.get("/project/MailBoxSG/check.xml");
+					}
+					Files.copy(source, dest, REPLACE_EXISTING);
+					File file = new File("/project/BankMailBox/check.xml");
+					file.delete();
+				}
+			}
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
+	public void manageChecks() {
+		try {
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db;
+			db = dbf.newDocumentBuilder();
+			// if this.id == 1
+			Document doc = db.parse("/project/MailBoxLCL/check.xml");
+			if (this.id == 2) {
+				doc = db.parse("/project/MailBoxBNP/check.xml");
+			} else if (this.id == 3) {
+				doc = db.parse("/project/MailBoxSG/check.xml");
+			}
+			NodeList amountList = doc.getElementsByTagName("amount");
+			NodeList dateList = doc.getDocumentElement().getElementsByTagName("date");
+			NodeList bankList = doc.getDocumentElement().getElementsByTagName("idBank");
+			NodeList idList = doc.getElementsByTagName("idCustomer");
+			Element idElement = (Element) idList.item(0);
+			int idCustomer = Integer.parseInt(idElement
+					.getElementsByTagName("idCustomer").item(0)
+					.getTextContent());
+			Customer customer = retrieveCustomer(idCustomer);
+			// test if amount et date exist
+			if (amountList != null && dateList != null) {
+				Element amElement = (Element) amountList.item(0);
+				int amount = Integer.parseInt(amElement
+						.getElementsByTagName("amount").item(0)
+						.getTextContent());
+				manageAmount(customer, amount);
+			} else {
+				// throw warning - send text to the bank (demandeur)
+
+				// if this.id == 1;
+				FileWriter fstream = new FileWriter("/project/MailBoxLCL/WrongCheck.txt");
+				Path source = Paths.get("/project/MailBoxLCL/WrongCheck.txt");
+				if (this.id == 2) {
+					fstream = new FileWriter("/project/MailBoxBNP/WrongCheck.txt");
+					source = Paths.get("/project/MailBoxBNP/WrongCheck.txt");
+				} else if (this.id == 3) {
+					fstream = new FileWriter("/project/MailBoxSG/WrongCheck.txt");
+					source = Paths.get("/project/MailBoxSG/WrongCheck.txt");
+				}
+				BufferedWriter out = new BufferedWriter(fstream);
+				out.write("The check for the client with id"
+						+ idCustomer
+						+ "that you sent has missing or wrong data. Please contact your client and send us a new one. ");
+				out.close();
+				// bank demandeur
+				Element bankElement = (Element) bankList.item(0);
+				int idBank = Integer.parseInt(bankElement.getElementsByTagName("idBank").item(0)
+						.getTextContent());
+				Path dest = Paths.get("/project/MailBoxLCL/WrongCheck.txt");
+				if (idBank == 2) {
+					dest = Paths.get("/project/MailBoxBNP/WrongCheck.txt");
+				} else if (idBank == 3) {
+					dest = Paths.get("/project/MailBoxSG/WrongCheck.txt");
+				}
+				Files.copy(source, dest, REPLACE_EXISTING);
+			}
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public void manageAmount(Customer customer, int amount) {
+		if (customer.getAmount() > amount) {
+			customer.setAmount(customer.getAmount() - amount);
+		} else {
+			// throw warning - send text to client
+			warnClient(customer, amount);
+		}
+	}
+
+	public void warnClient(Customer customer, int amount) {
+		// throw warning - send text to client
+		// if this.id == 1;
+		FileWriter fstream;
+		try {
+			fstream = new FileWriter("/project/MailBoxLCL/AccountWarning.txt");
+			Path source = Paths.get("/project/MailBoxLCL/AccountWarning.txt");
+			if (this.id == 2) {
+				fstream = new FileWriter("/project/MailBoxBNP/AccountWarning.txt");
+				source = Paths.get("/project/MailBoxBNP/AccountWarning.txt");
+			} else if (this.id == 3) {
+				fstream = new FileWriter("/project/MailBoxSG/AccountWarning.txt");
+				source = Paths.get("/project/MailBoxSG/AccountWarning.txt");
+			}
+				BufferedWriter out = new BufferedWriter(fstream);
+				out.write("Dear client "
+						+ customer.getName()
+						+ " . We would like to inform you that your latest demand for a check of "
+						+ amount
+						+ " euros/dollars has been declined, as you have only "
+						+ customer.getAmount()
+						+ " euros/dollars left in your bank account. Please deposit money before you do another check deposit. ");
+				out.close();
+				Path dest = Paths.get("/project/Customer_0/AccountWarning.txt");
+				Files.copy(source, dest, REPLACE_EXISTING);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }
