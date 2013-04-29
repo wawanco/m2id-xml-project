@@ -38,22 +38,23 @@ public class Company {
 
 	private int id;
 	private String name;
+	private String pathToMailbox;
 	private int idBank;
 	private double minAmount;
-	private String currency;
+	private Check.Currency currency;
 	private ArrayList<Product> productList;
 	private Map<Product, Integer> sumProductQuantity;
 
-	public Company(int id, String name, int idBank, double minAmount,
-			String currency, ArrayList<Product> productList) {
-
-		this.id = id;
-		this.name = name;
-		this.idBank = idBank;
-		this.minAmount = minAmount;
-		this.currency = currency;
+	public Company(int id, String name, int idBank, double minAmount, Check.Currency currency, ArrayList<Product> productList) {
+		this.id          = id;
+		this.name        = name;
+		this.idBank      = idBank;
+		this.minAmount   = minAmount;
+		this.currency    = currency;
 		this.productList = productList;
-
+		pathToMailbox = "./mailboxes/Company_" + id;
+		File dir = new File(pathToMailbox);
+		dir.mkdirs();
 	}
 
 	public String getName() {
@@ -80,12 +81,16 @@ public class Company {
 		this.minAmount = minAmount;
 	}
 
-	public String getCurrency() {
+	public Check.Currency getCurrency() {
 		return currency;
 	}
 
-	public void setCurrency(String currency) {
+	public void setCurrency(Check.Currency currency) {
 		this.currency = currency;
+	}
+	
+	public String getPathToMailbox() {
+		return pathToMailbox;
 	}
 
 	public void checkOrder() {
@@ -133,7 +138,7 @@ public class Company {
 						if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 							Element eElement = (Element) nNode;
 							// test currency
-							if (eElement.getAttribute("type") == this.currency) {
+							if (eElement.getAttribute("type").equals(currency)) {
 								// test stock
 								for (int i = 0; i < productList.size(); i++) {
 									if (sumProductQuantity.get(productList.get(i)) <= productList.get(i).getStock()) {

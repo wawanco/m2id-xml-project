@@ -1,28 +1,17 @@
 package myxmlproject;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.text.DateFormatSymbols;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class Customer {
 	// 1. Choisir le GdC (getter/setter idBank?)
@@ -73,9 +62,10 @@ public class Customer {
 	// Constructor
 	public Customer(String firstname, String name, int idBank, int id) {
 		this.firstname = firstname;
-		this.name = name;
-		this.idBank = idBank;
-		this.id = id;
+		this.name      = name;
+		this.idBank    = idBank;
+		this.id        = id;
+		checkbook = new ArrayList<Check>();
 		directory = "./Bank_" + idBank + "/Customer_" + id;
 		File dir = new File(directory);
 		dir.mkdirs();
@@ -83,13 +73,19 @@ public class Customer {
 	
 	public static Customer getInstanceFromNode(Node nCustomer, int idBank) {
 		Element eIdentity   = (Element) ((Element) nCustomer).getElementsByTagName("identity"  ).item(0);
-		Element eIdCustomer = (Element) ((Element) nCustomer).getElementsByTagName("idCutsomer").item(0);
-		return new Customer(
+		Element eIdCustomer = (Element) ((Element) nCustomer).getElementsByTagName("idCustomer").item(0);
+		Customer c = new Customer(
 			eIdentity.getAttribute("firstname")
 		,	eIdentity.getAttribute("name")
 		,	idBank
-		,	Integer.parseInt(eIdCustomer.getNodeValue())
+		,	Integer.parseInt(eIdCustomer.getTextContent())
 		);
+		Node checkList  = ((Element) nCustomer).getElementsByTagName("checkList").item(0);
+		NodeList checks = ((Element) checkList).getElementsByTagName("check");
+		for(int i = 0; i < checks.getLength(); i++) {
+			c.addToCheckBook(Check.getInstanceFromNode(checks.item(i), c));
+		}
+		return c;
 	}
 
 	// Getters and setters
@@ -102,55 +98,42 @@ public class Customer {
 	}
 
 	// Public methods
-	public void fillCheck(double amount, Date date) {
-		// Customer will use this function to fill the amount and date of a
-		// check
-		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db;
-			db = dbf.newDocumentBuilder();
-			// TODO donner la vrai adresse du check
-			Document doc = db.parse("/project/check.xml");
-			// On remplit le montant
-			NodeList amountList = doc.getDocumentElement().getElementsByTagName("amount");
-			Element eAmount;
-			if(amountList == null) {
-				eAmount = doc.createElement("amount");
-				doc.getDocumentElement().appendChild(eAmount);
-			} else {
-				eAmount = ((Element) amountList.item(0));
+	public void addToCheckBook(Check check) {
+		checkbook.add(check);
+	}
+	
+	public int fillCheck(double amount, Date date, Check.Currency currency) {
+		int i = 0;
+		Check check;
+		while(i < checkbook.size()) {
+			check = checkbook.get(i++);
+			if(currency.equals(check.getCurrency())){
+				check.fillCheck(amount, date);
+				return check.getId();
 			}
-			eAmount.appendChild(doc.createTextNode(Double.toString(amount)));
-			// On remplit la date
-			NodeList dateList = doc.getDocumentElement().getElementsByTagName("date");
-			Element eDate;
-			if(dateList == null) {
-				eDate = doc.createElement("date");
-				doc.getDocumentElement().appendChild(eDate);
-			} else {
-				eDate = ((Element) dateList.item(0));
-			}
-			GregorianCalendar calendar = new GregorianCalendar();
-			calendar.setTime(date);
-			eDate.setAttribute("day"  , "" + calendar.get(Calendar.DAY_OF_MONTH));
-			eDate.setAttribute("month", new DateFormatSymbols().getMonths()[calendar.get(Calendar.MONTH) - 1]);
-			eDate.setAttribute("year" , "" + calendar.get(Calendar.YEAR));
-			// Ecrire le nouveau xml
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File("/project/mailBox/check.xml"));
-			transformer.transform(source, result);
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		System.out.println("There is no more check in " + currency + ".");
+		return -1;
+	}
+	
+	public void sendCheck(int idCheck, Company c) throws IOException {
+		int i = 0;
+		while(i < checkbook.size()) {
+			Check check = checkbook.get(i);
+			if(check.getId() == idCheck && check.isFilled()){
+				String dest = c.getPathToMailbox() + "/Customer_" + id + "_Check_" + check.getId() + ".xml";
+				Files.copy(
+					Paths.get(check.getPathToXml())
+				,	Paths.get(dest)
+				, 	REPLACE_EXISTING
+				);
+				checkbook.remove(i);
+				check.delete();
+				return;
+			}
+			i++;
+		}
+		return;
 	}
 
 	public String toString() {

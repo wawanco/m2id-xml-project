@@ -51,8 +51,7 @@ public class Bank {
 		// Initialize parser
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
-			dbf.setFeature("http://apache.org/xml/features/validation/schema",
-					true);
+			dbf.setFeature("http://apache.org/xml/features/validation/schema", true);
 			dbf.setValidating(true);
 			dbf.setNamespaceAware(true);
 			DocumentBuilder db;
@@ -60,9 +59,7 @@ public class Bank {
 			if (!f.isFile()) {
 				customerBase = db.newDocument();
 				Element root = customerBase.createElement("customerList");
-				root.setAttributeNS(
-						XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI,
-						"noNamespaceSchemaLocation", PATH_TO_XSD);
+				root.setAttributeNS(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "noNamespaceSchemaLocation", PATH_TO_XSD);
 				customerBase.appendChild(root);
 			} else {
 				customerBase = db.parse(f);
@@ -97,14 +94,16 @@ public class Bank {
 	public void generateChecks(Customer c, int nbEuros, int nbDollars) {
 		int checkId = 1;
 		for (int i = 0; i < nbEuros; i++) {
-			Check check = new Check(checkId++, id, c.getId(), Check.Currency.Euros);
-			check.createXml(c.getDirectory());
+			Check check = new Check(checkId++, id, c, Check.Currency.euros);
+			check.writeXml();
+			c.addToCheckBook(check);
 			addCheckToBase(c, check);
 		}
 
 		for (int i = 0; i < nbDollars; i++) {
-			Check check = new Check(checkId++, id, c.getId(), Check.Currency.Dollars);
-			check.createXml(c.getDirectory());
+			Check check = new Check(checkId++, id, c, Check.Currency.dollars);
+			check.writeXml();
+			c.addToCheckBook(check);
 			addCheckToBase(c, check);
 		}
 	}
@@ -157,20 +156,12 @@ public class Bank {
 	
 	private void addCheckToBase(Customer customer, Check check) {
 		// Create check element
-		Element eCheck     = customerBase.createElement("check"     );
-		Element idCheck    = customerBase.createElement("idCheck"   );
-		Element idBank     = customerBase.createElement("idBank"    );
-		Element idCustomer = customerBase.createElement("idCustomer");
-		idCheck   .appendChild(customerBase.createTextNode(String.valueOf(check.getId())));
-		idBank    .appendChild(customerBase.createTextNode(String.valueOf(check.getIdBank())));
-		idCustomer.appendChild(customerBase.createTextNode(String.valueOf(check.getIdCustomer())));
-		eCheck.appendChild(idCheck   );
-		eCheck.appendChild(idBank    );
-		eCheck.appendChild(idCustomer);
+		Node checkNode = check.createCheckNode();
+		customerBase.adoptNode(checkNode);
 		// Add to checkList
 		Element eCustomer = (Element) retrieveCustomerNode(customer.getId());
 		Element eCheckLst = (Element) eCustomer.getElementsByTagName("checkList").item(0);
-		eCheckLst.appendChild(eCheck);
+		eCheckLst.appendChild(checkNode);
 		// Overwrite base
 		writeXML();
 	}
@@ -178,8 +169,7 @@ public class Bank {
 	public void writeXML() {
 		try {
 			// write the content into xml file
-			Transformer tFormer = TransformerFactory.newInstance()
-					.newTransformer();
+			Transformer tFormer = TransformerFactory.newInstance().newTransformer();
 			tFormer.setOutputProperty(OutputKeys.INDENT, "yes");
 			DOMSource source = new DOMSource(customerBase);
 			StreamResult result = new StreamResult(new File(pathToBase));
@@ -222,13 +212,10 @@ public class Bank {
 				}
 			}
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParserConfigurationException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -292,13 +279,10 @@ public class Bank {
 				Files.copy(source, dest, REPLACE_EXISTING);
 			}
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -339,7 +323,6 @@ public class Bank {
 				Path dest = Paths.get("/project/Customer_0/AccountWarning.txt");
 				Files.copy(source, dest, REPLACE_EXISTING);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

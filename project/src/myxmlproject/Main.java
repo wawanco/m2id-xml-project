@@ -1,7 +1,3 @@
-//*** TODO ***
-/// Comment setter l'id du customer
-/// Est-ce que la classe check est necessaire
-
 package myxmlproject;
 
 import java.io.BufferedReader;
@@ -12,7 +8,6 @@ import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.TransformerConfigurationException;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -69,7 +64,7 @@ public class Main {
 			if(qName.equals("company")) {
 				ArrayList<Product> myProductList = new ArrayList<Product>();
 				for(Product p: pList) myProductList.add(p.clone());
-				cList.add(new Company(i++, cName, idBank, minAmount, currency, myProductList));
+				cList.add(new Company(i++, cName, idBank, minAmount, Check.Currency.valueOf(currency), myProductList));
 				pList.clear();
 			}
 		}
@@ -148,15 +143,11 @@ public class Main {
 		}
 	}
 	
-	// banks
-	//private static HashMap<Integer, String> banks = new HashMap<Integer, String>();
 	private static final String[] banks   = {"LCL", "BNP", "Société Générale"};
 	private static Bank[] bankObj = new Bank[banks.length];
-
 	private static ArrayList<Company> companies;
 
 	public static void main(String[] args) {
-
 		// Initializing
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		try {
@@ -236,7 +227,12 @@ public class Main {
 						goShopping = false;
 						for(Order o: myOrders) {
 							Date date = new Date();
-							customer.fillCheck(o.calculateSum(), date);
+							int idCheck = customer.fillCheck(o.calculateSum(), date, companies.get(o.getIdCompany()).getCurrency());
+							if(idCheck == -1) {
+								System.out.println("Your order for " + companies.get(o.getIdCompany()).getName() + " cannot be completed");
+							} else {
+								customer.sendCheck(idCheck, companies.get(o.getIdCompany()));
+							}
 						}
 					} else {
 						selection = promptOptions();

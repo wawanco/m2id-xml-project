@@ -39,5 +39,4 @@ public class Product {
 	public Product clone() {
 		return new Product(name, stock, unitPrice);
 	}
-
 }
