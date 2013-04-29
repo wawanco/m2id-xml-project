@@ -60,6 +60,18 @@ public class Check {
 		}
 	}
 	
+	public int getId() {
+		return id;
+	}
+
+	public int getIdBank() {
+		return idBank;
+	}
+
+	public int getIdCustomer() {
+		return idCustomer;
+	}
+
 	public Element createCheckNode() {
 		Element root = doc.createElement("check");
 		// Attributes

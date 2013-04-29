@@ -89,8 +89,7 @@ public class Bank {
 	// Public methods
 	public Customer registerCustomer(String firstname, String name, int deposit) {
 		// TODO gerer le deposit
-		Customer customer = new Customer(firstname, name, id,
-				generateCustomerId());
+		Customer customer = new Customer(firstname, name, id, generateCustomerId());
 		addCustomerToBase(customer);
 		return customer;
 	}
@@ -98,34 +97,31 @@ public class Bank {
 	public void generateChecks(Customer c, int nbEuros, int nbDollars) {
 		int checkId = 1;
 		for (int i = 0; i < nbEuros; i++) {
-			Check check = new Check(checkId++, id, c.getId(),
-					Check.Currency.Euros);
+			Check check = new Check(checkId++, id, c.getId(), Check.Currency.Euros);
 			check.createXml(c.getDirectory());
+			addCheckToBase(c, check);
 		}
 
 		for (int i = 0; i < nbDollars; i++) {
-			Check check = new Check(checkId++, id, c.getId(),
-					Check.Currency.Dollars);
+			Check check = new Check(checkId++, id, c.getId(), Check.Currency.Dollars);
 			check.createXml(c.getDirectory());
+			addCheckToBase(c, check);
 		}
 	}
 
-	public Customer retrieveCustomer(int idCustomer) {
+	private Node retrieveCustomerNode(int idCustomer) {
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		try {
-			String expr = "/customerList/customer[idCustomer = '" + idCustomer
-					+ "']";
-			Node res = (Node) xpath.evaluate(expr, customerBase,
-					XPathConstants.NODE);
-			Element eIdentity = (Element) ((Element) res).getElementsByTagName(
-					"identity").item(0);
-			Customer customer = new Customer(
-					eIdentity.getAttribute("firstname"),
-					eIdentity.getAttribute("name"), id, idCustomer);
-			return customer;
+			String expr = "/customerList/customer[idCustomer = '" + idCustomer + "']";
+			return (Node) xpath.evaluate(expr, customerBase, XPathConstants.NODE);
 		} catch (XPathExpressionException e) {
 			return null;
 		}
+	}
+	
+	public Customer retrieveCustomer(int idCustomer) {
+		Node nCustomer = retrieveCustomerNode(idCustomer);
+		return Customer.getInstanceFromNode(nCustomer, id);
 	}
 
 	// Private methods
@@ -134,11 +130,8 @@ public class Bank {
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		Double dId = null;
 		try {
-			dId = (Double) xpath.evaluate(
-					"/customerList/customer[last()]/idCustomer/text()",
-					customerBase, XPathConstants.NUMBER);
-			if (dId.isNaN())
-				dId = 0.0;
+			dId = (Double) xpath.evaluate("/customerList/customer[last()]/idCustomer/text()", customerBase, XPathConstants.NUMBER);
+			if (dId.isNaN()) dId = 0.0;
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		}
@@ -155,18 +148,33 @@ public class Bank {
 		Text texte = customerBase.createTextNode("" + c.getId());
 		idCustomer.appendChild(texte);
 		Element listCheck = customerBase.createElement("checkList");
-		// for(Check ch: c.getCheckbook()) {
-		// Element check = ch.createCheckNode();
-		// customerBase.adoptNode(check);
-		// listCheck.appendChild(check);
-		// }
 		customer.appendChild(identite);
 		customer.appendChild(idCustomer);
 		customer.appendChild(listCheck);
 		customerBase.getDocumentElement().appendChild(customer);
 		writeXML();
 	}
-
+	
+	private void addCheckToBase(Customer customer, Check check) {
+		// Create check element
+		Element eCheck     = customerBase.createElement("check"     );
+		Element idCheck    = customerBase.createElement("idCheck"   );
+		Element idBank     = customerBase.createElement("idBank"    );
+		Element idCustomer = customerBase.createElement("idCustomer");
+		idCheck   .appendChild(customerBase.createTextNode(String.valueOf(check.getId())));
+		idBank    .appendChild(customerBase.createTextNode(String.valueOf(check.getIdBank())));
+		idCustomer.appendChild(customerBase.createTextNode(String.valueOf(check.getIdCustomer())));
+		eCheck.appendChild(idCheck   );
+		eCheck.appendChild(idBank    );
+		eCheck.appendChild(idCustomer);
+		// Add to checkList
+		Element eCustomer = (Element) retrieveCustomerNode(customer.getId());
+		Element eCheckLst = (Element) eCustomer.getElementsByTagName("checkList").item(0);
+		eCheckLst.appendChild(eCheck);
+		// Overwrite base
+		writeXML();
+	}
+	
 	public void writeXML() {
 		try {
 			// write the content into xml file

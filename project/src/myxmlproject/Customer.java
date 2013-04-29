@@ -20,6 +20,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -78,6 +79,17 @@ public class Customer {
 		directory = "./Bank_" + idBank + "/Customer_" + id;
 		File dir = new File(directory);
 		dir.mkdirs();
+	}
+	
+	public static Customer getInstanceFromNode(Node nCustomer, int idBank) {
+		Element eIdentity   = (Element) ((Element) nCustomer).getElementsByTagName("identity"  ).item(0);
+		Element eIdCustomer = (Element) ((Element) nCustomer).getElementsByTagName("idCutsomer").item(0);
+		return new Customer(
+			eIdentity.getAttribute("firstname")
+		,	eIdentity.getAttribute("name")
+		,	idBank
+		,	Integer.parseInt(eIdCustomer.getNodeValue())
+		);
 	}
 
 	// Getters and setters
