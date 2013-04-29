@@ -15,7 +15,7 @@
 			The bank with id number 1 has
 			<!-- <xsl:value-of select="count(customer/idBank[contains(concat(' ',.,' 
 				'), '1')])"/> -->
-			<xsl:value-of select="count(customer/idBank/text()[contains(., '1')]) " />
+			<xsl:value-of select="count(customer/checkList/check/idBank/text()[contains(., '1')]) " />
 			clients
 		</h3>
 		<xsl:apply-templates select="//customer" />
@@ -29,16 +29,16 @@
 
 	<xsl:template match="customer">
 		<xsl:choose>
-			<xsl:when test="idBank='1'">
+			<xsl:when test="checkList/check/idBank='1'">
 				<p>
 					<h4>
-						- Le client with name
+						- The client with name
 					</h4>
-					<xsl:value-of select="identite/@firstname" />
+					<xsl:value-of select="identity/@firstname" />
 					<h4>
 						and surname
 					</h4>
-					<xsl:value-of select="identite/@name" />
+					<xsl:value-of select="identity/@name" />
 					<h4>
 						with customer id
 					</h4>
@@ -47,7 +47,7 @@
 						who deposited
 					</h4>
 					<xsl:call-template name="nombre">
-						<xsl:with-param name="noeud" select="listCheck/check" />
+						<xsl:with-param name="noeud" select="checkList/check" />
 					</xsl:call-template>
 					<h4>
 						check(s)
