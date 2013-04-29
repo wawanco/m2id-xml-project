@@ -199,7 +199,7 @@ public class Main {
 						System.out.println("\tType " + i + " if you want to buy " + chosenCpny.getProductList().get(i).getName());
 					}
 					Product product = chosenCpny.getProductList().get(Integer.parseInt(stdinp.readLine()));
-					System.out.println("The price of the product selected is " + product.getUnitPrice() + " " + companies.get(idCompany).getCurrency());
+					System.out.println("The price of the product selected is " + product.getUnitPrice() + " " + chosenCpny.getCurrency());
 					System.out.println("Select the quantity that you wish to buy: ");
 					int quantity = Integer.parseInt(stdinp.readLine());
 					boolean isOrderAdded = false;
@@ -210,7 +210,7 @@ public class Main {
 						}
 					}
 					if(!isOrderAdded){
-						Order newOrder = new Order(0, customer.getId(), idCompany);
+						Order newOrder = new Order(0, customer.getId(), idCompany, chosenCpny.getCurrency());
 						newOrder.addProduct(product, quantity);
 						myOrders.add(newOrder);
 					}
@@ -226,12 +226,16 @@ public class Main {
 					if (stdinp.readLine().substring(0,1).equalsIgnoreCase("y")) {
 						goShopping = false;
 						for(Order o: myOrders) {
+							Company myCompany = companies.get(o.getIdCompany());
 							Date date = new Date();
-							int idCheck = customer.fillCheck(o.calculateSum(), date, companies.get(o.getIdCompany()).getCurrency());
+							int idCheck = customer.fillCheck(o.calculateSum(), date, myCompany.getCurrency());
 							if(idCheck == -1) {
-								System.out.println("Your order for " + companies.get(o.getIdCompany()).getName() + " cannot be completed");
+								System.out.println("Your order for " + myCompany.getName() + " cannot be completed");
 							} else {
-								customer.sendCheck(idCheck, companies.get(o.getIdCompany()));
+								customer.sendCheck(idCheck, myCompany);
+								o.sendOrder(myCompany.getPathToMailbox());
+								if(myCompany.checkOrder(myCompany.getPathToMailbox() + "/order.xml"))
+									System.out.println("Your order for " + myCompany.getName() + " is completed");
 							}
 						}
 					} else {

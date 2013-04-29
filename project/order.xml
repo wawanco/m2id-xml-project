@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="order.xsl"?>
+<!DOCTYPE orderList SYSTEM "order.dtd" >
+<order id="1">
+	<idCustomer>1</idCustomer>
+	<idCompany>1</idCompany>
+	<currency type="euros"/>
+	<cart>
+		<item>
+				<product>
+					<name>burger</name>
+					<unitPrice>4</unitPrice>
+				</product>
+				<quantity>2</quantity>
+		</item>
+		<item>
+				<product>
+					<name>drink</name>
+					<unitPrice>1</unitPrice>
+				</product>
+				<quantity>3</quantity>
+		</item>
+	</cart>
+</order>

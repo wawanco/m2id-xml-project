@@ -43,7 +43,6 @@ public class Company {
 	private double minAmount;
 	private Check.Currency currency;
 	private ArrayList<Product> productList;
-	private Map<Product, Integer> sumProductQuantity;
 
 	public Company(int id, String name, int idBank, double minAmount, Check.Currency currency, ArrayList<Product> productList) {
 		this.id          = id;
@@ -92,74 +91,52 @@ public class Company {
 	public String getPathToMailbox() {
 		return pathToMailbox;
 	}
+	
+	private Product getProductByName(String name){
+		for(Product p: productList){
+			if(p.getName().equals(name))
+				return p;
+		}
+		return null;
+	}
 
-	public void checkOrder() {
-		boolean validate = false;
+	public boolean checkOrder(String pathToOrder) {
+		// TODO Utiliser un schema pour la validation?
+		boolean validate = true;
+		int sumAmount = 0;
 		try {
-			try {
-				File fXmlFile = new File("/project/mailBox/check.xml");
-				DocumentBuilderFactory dbFactory = DocumentBuilderFactory
-						.newInstance();
-				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-				Document doc = dBuilder.parse(fXmlFile);
-				doc.getDocumentElement().normalize();
-
-				int sumAmount = 0;
-				NodeList nList = doc.getElementsByTagName("product");
-				for (int temp = 0; temp < nList.getLength(); temp++) {
-					Node nNode = nList.item(temp);
-					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-						Element eElement = (Element) nNode;
-						// calculate sum Amount
-						sumAmount += (Integer.parseInt(eElement
-								.getElementsByTagName("unitPrice").item(0)
-								.getTextContent()));
-						String name = eElement.getElementsByTagName("name")
-								.item(0).getTextContent();
-						// calculate sum Quantity
-						if (sumProductQuantity.containsKey(name)) {
-							int o = sumProductQuantity.get(name);
-							sumProductQuantity.remove(name);
-							for (int j = 0; j < productList.size(); j++) {
-								if (productList.get(j).toString() == name) {
-									sumProductQuantity.put(productList.get(j),
-											o + 1);
-								}
-							}
-
-						}
-					}
-				}
-				// test minAmount
-				if (sumAmount >= this.minAmount) {
-					NodeList n2List = doc.getElementsByTagName("currency");
-					for (int temp = 0; temp < n2List.getLength(); temp++) {
-						Node nNode = n2List.item(temp);
-						if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-							Element eElement = (Element) nNode;
-							// test currency
-							if (eElement.getAttribute("type").equals(currency)) {
-								// test stock
-								for (int i = 0; i < productList.size(); i++) {
-									if (sumProductQuantity.get(productList.get(i)) <= productList.get(i).getStock()) {
-										validate = true;
-									}
-								}
-							}
-						}
-					}
-				}
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document doc = db.parse(new File(pathToOrder));
+			// Validate minimal amount and stock
+			NodeList nList = doc.getElementsByTagName("item");
+			for (int i = 0; i < nList.getLength(); i++) {
+				Element e = (Element) nList.item(i);
+				int qty = Integer.parseInt(e.getElementsByTagName("quantity").item(0).getTextContent());
+				sumAmount += (
+					Double.parseDouble(e.getElementsByTagName("unitPrice").item(0).getTextContent())
+				*	qty
+				);
+				String name = e.getElementsByTagName("name").item(0).getTextContent();
+				validate &= getProductByName(name).getStock() >= qty;
 			}
+			validate &= (sumAmount >= minAmount);
+			// Validate currency
+			Check.Currency oCurrency = Check.Currency.valueOf(
+				((Element) doc.getElementsByTagName("currency").item(0)).getAttribute("type")
+			);
+			validate &= (oCurrency.equals(currency));
+			//TODO Si la commande est validee il faudrait diminuer le stock.
+			Files.delete(Paths.get(pathToOrder));
+			return validate;
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (validate = true) {
-			sendCheck();
-		}
+		return false;
 	}
 
 	public void sendCheck() {

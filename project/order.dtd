@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT order (idCustomer, idCompany, currency, cart)>
+<!ATTLIST order
+	id CDATA #REQUIRED
+>
+<!ELEMENT idCompany (#PCDATA)>
+<!ELEMENT idCheck   (#PCDATA)>
+<!ELEMENT currency  EMPTY>
+<!ATTLIST currency type (euros|dollars) "euros">
+<!ELEMENT cart (item)+>
+<!ELEMENT item (product, quantity)>
+<!ELEMENT product (name, unitPrice)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT unitPrice (#PCDATA)>
+<!ELEMENT quantity (#PCDATA)>
