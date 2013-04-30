@@ -51,7 +51,7 @@ public class Company {
 		this.minAmount   = minAmount;
 		this.currency    = currency;
 		this.productList = productList;
-		pathToMailbox = "./mailboxes/Company_" + id;
+		pathToMailbox = "./Company_" + id;
 		File dir = new File(pathToMailbox);
 		dir.mkdirs();
 	}
@@ -148,6 +148,6 @@ public class Company {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		new File(pathToCheck).delete();
+		(new File(pathToCheck)).delete();
 	}
 }

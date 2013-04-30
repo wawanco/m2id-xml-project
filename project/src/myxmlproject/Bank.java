@@ -35,7 +35,6 @@ import java.nio.file.Paths;
 
 public class Bank {
 	private static String PATH_TO_XSD = "customer-base.xsd";
-	private static String BASE_DIR = ".";
 
 	private int      id;
 	private String   name;
@@ -48,7 +47,9 @@ public class Bank {
 		this.id    = id;
 		this.name  = name;
 		pathToMailbox = "./Bank_" + id;
-		pathToBase    = BASE_DIR + "/customer-base_" + id + ".xml";
+		File mb = new File(pathToMailbox);
+		mb.mkdirs();
+		pathToBase    = "/customer-base_" + id + ".xml";
 		File f = new File(pathToBase);
 		// Initialize parser
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

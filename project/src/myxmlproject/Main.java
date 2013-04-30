@@ -149,6 +149,9 @@ public class Main {
 
 	public static void main(String[] args) {
 		// Initializing
+		for(int i = 0; i < banks.length; i++) {
+			bankObj[i] = new Bank(i, banks[i]);
+		}
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		try {
 			spf.setFeature("http://xml.org/sax/features/validation", true);
@@ -168,9 +171,6 @@ public class Main {
 		}
 
 		BufferedReader stdinp = new BufferedReader(new InputStreamReader(System.in));
-		for(int i = 0; i < banks.length; i++) {
-			bankObj[i] = new Bank(i, banks[i]);
-		}
 
 		System.out.println("Welcome. Are you a new customer? (Yes/No)");
 		try {
