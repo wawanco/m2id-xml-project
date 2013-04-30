@@ -1,7 +1,5 @@
 package myxmlproject;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,19 +23,19 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 
 public class Bank {
+	//===========================
+	// Static attributes
+	//===========================
 	private static String PATH_TO_BASE_XSD = "customer-base.xsd";
 	private static String PATH_TO_RC_XSD   = "received-checks.xsd";
 
+	//===========================
+	// Private attributes
+	//===========================
 	private int      id;
 	private String   name;
 	private String   pathToBase;
@@ -46,7 +44,9 @@ public class Bank {
 	private String   pathToMailbox;
 	private String   pathToReceivedCheck; 
 
-	// Construtor
+	//===========================
+	// Constructors
+	//===========================
 	public Bank(int id, String name) {
 		this.id    = id;
 		this.name  = name;
@@ -59,10 +59,16 @@ public class Bank {
 		receivedChecks = InitializeXML("checkList"   , PATH_TO_RC_XSD  , pathToReceivedCheck);
 	}
 
+	//===========================
+	// Static methods
+	//===========================
 	private static String getPathToMailbox(int id) {
 		return "./Bank_" + id;
 	}
 	
+	//===========================
+	// Public methods
+	//===========================
 	// Getters and setters
 	public int getId() {
 		return id;
@@ -76,7 +82,7 @@ public class Bank {
 		return pathToMailbox;
 	}
 
-	// Public methods
+	// Others
 	public Customer registerCustomer(String firstname, String name, int deposit) {
 		// TODO gerer le deposit
 		Customer customer = new Customer(firstname, name, this, generateCustomerId());
@@ -92,7 +98,6 @@ public class Bank {
 			c.addToCheckBook(check);
 			addCheckToBase(c, check);
 		}
-
 		for (int i = 0; i < nbDollars; i++) {
 			Check check = new Check(checkId++, id, c, Check.Currency.dollars);
 			check.writeXml();
@@ -101,6 +106,38 @@ public class Bank {
 		}
 	}
 
+	public Customer retrieveCustomer(int idCustomer) {
+		Node nCustomer = retrieveCustomerNode(idCustomer);
+		return Customer.getInstanceFromNode(nCustomer, this);
+	}
+
+	public void sendCheckToPayer(){
+		NodeList nlChecks = receivedChecks.getDocumentElement().getChildNodes();
+		for(int i = 0; i < nlChecks.getLength(); i++) {
+			int idBank = Check.readBankId(nlChecks.item(i));
+			String pathToMailBox = Bank.getPathToMailbox(idBank);
+			Document checkDoc = createDoc("check", Check.PATH_TO_XSD);
+			writeDocument(checkDoc, pathToMailBox);
+		}
+	}
+	
+	public void cashCheck(String pathToCheck) {
+		File f = new File(pathToCheck);
+		Element e = parseFile(f).getDocumentElement();
+		receivedChecks.adoptNode(e);
+		receivedChecks.getDocumentElement().appendChild(e);
+		writeDocument(receivedChecks, pathToReceivedCheck);
+		f.delete();
+	}
+	
+	public void debitAccount() {
+		;
+	}
+
+
+	//===========================
+	// Private methods
+	//===========================
 	private Document parseFile(File f) {
 		Document doc = null;
 		// Initialize parser
@@ -163,12 +200,6 @@ public class Bank {
 		}
 	}
 	
-	public Customer retrieveCustomer(int idCustomer) {
-		Node nCustomer = retrieveCustomerNode(idCustomer);
-		return Customer.getInstanceFromNode(nCustomer, this);
-	}
-
-	// Private methods
 	private int generateCustomerId() {
 		// Cherche le dernier client dans la base et incremente l'id.
 		XPath xpath = XPathFactory.newInstance().newXPath();
@@ -183,25 +214,6 @@ public class Bank {
 		return ++id;
 	}
 	
-	public void sendCheckToPayer(){
-		NodeList nlChecks = receivedChecks.getDocumentElement().getChildNodes();
-		for(int i = 0; i < nlChecks.getLength(); i++) {
-			int idBank = Check.readBankId(nlChecks.item(i));
-			String pathToMailBox = Bank.getPathToMailbox(idBank);
-			Document checkDoc = createDoc("check", Check.PATH_TO_XSD);
-			writeDocument(checkDoc, pathToMailBox);
-		}
-	}
-	
-	public void cashCheck(String pathToCheck) {
-		File f = new File(pathToCheck);
-		Element e = parseFile(f).getDocumentElement();
-		receivedChecks.adoptNode(e);
-		receivedChecks.getDocumentElement().appendChild(e);
-		writeDocument(receivedChecks, pathToReceivedCheck);
-		f.delete();
-	}
-
 	private void addCustomerToBase(Customer c) {
 		Element customer = customerBase.createElement("customer");
 		Element identite = customerBase.createElement("identity");
@@ -230,7 +242,7 @@ public class Bank {
 		writeDocument(customerBase, pathToBase);
 	}
 	
-	public void writeDocument(Document doc, String path) {
+	private void writeDocument(Document doc, String path) {
 		try {
 			// write the content into xml file
 			Transformer tFormer = TransformerFactory.newInstance().newTransformer();
@@ -245,11 +257,8 @@ public class Bank {
 			e.printStackTrace();
 		}
 	}
-	
-	public void debitAccount() {
-		;
-	}
 
+	/*
 	public void demandChecks() {
 		File fXmlFile = new File("/project/BankMailBox/check.xml");
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -394,5 +403,5 @@ public class Bank {
 			e.printStackTrace();
 		}
 	}
-
+	 */
 }
