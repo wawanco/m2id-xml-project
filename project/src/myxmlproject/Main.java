@@ -136,6 +136,7 @@ public class Main {
 			System.out.println("\tType 1 if want to buy items");
 			System.out.println("\tType 2 if want to see your shopping cart");
 			System.out.println("\tType 3 if want to exit without buying");
+			System.out.println("\tType 4 run end of day");
 			return Integer.parseInt(stdinp.readLine());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -248,6 +249,14 @@ public class Main {
 					goShopping = false;
 					System.exit(0);
 					break;
+				case 4:
+					for(Bank b: bankObj){
+						b.sendCheckToPayer();
+					}
+					for(Bank b: bankObj){
+						b.debitAccount();
+					}
+					selection = promptOptions();
 				default:
 					System.out.println("Unknown command, try again.");
 					selection = promptOptions();

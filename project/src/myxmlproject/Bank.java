@@ -50,7 +50,7 @@ public class Bank {
 	public Bank(int id, String name) {
 		this.id    = id;
 		this.name  = name;
-		pathToMailbox = "./Bank_" + id;
+		pathToMailbox = Bank.getPathToMailbox(id);
 		File mb = new File(pathToMailbox);
 		mb.mkdirs();
 		pathToBase = "./customer-base_" + id + ".xml";
@@ -59,6 +59,10 @@ public class Bank {
 		receivedChecks = InitializeXML("checkList"   , PATH_TO_RC_XSD  , pathToReceivedCheck);
 	}
 
+	private static String getPathToMailbox(int id) {
+		return "./Bank_" + id;
+	}
+	
 	// Getters and setters
 	public int getId() {
 		return id;
@@ -179,11 +183,23 @@ public class Bank {
 		return ++id;
 	}
 	
+	public void sendCheckToPayer(){
+		NodeList nlChecks = receivedChecks.getDocumentElement().getChildNodes();
+		for(int i = 0; i < nlChecks.getLength(); i++) {
+			int idBank = Check.readBankId(nlChecks.item(i));
+			String pathToMailBox = Bank.getPathToMailbox(idBank);
+			Document checkDoc = createDoc("check", Check.PATH_TO_XSD);
+			writeDocument(checkDoc, pathToMailBox);
+		}
+	}
+	
 	public void cashCheck(String pathToCheck) {
-		Element e = parseFile(new File(pathToCheck)).getDocumentElement();
+		File f = new File(pathToCheck);
+		Element e = parseFile(f).getDocumentElement();
 		receivedChecks.adoptNode(e);
-		receivedChecks.appendChild(e);
+		receivedChecks.getDocumentElement().appendChild(e);
 		writeDocument(receivedChecks, pathToReceivedCheck);
+		f.delete();
 	}
 
 	private void addCustomerToBase(Customer c) {
@@ -228,6 +244,10 @@ public class Bank {
 		} catch (TransformerException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void debitAccount() {
+		;
 	}
 
 	public void demandChecks() {

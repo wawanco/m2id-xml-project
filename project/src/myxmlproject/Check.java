@@ -34,7 +34,7 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 public class Check {
-	private static String PATH_TO_XSD = "check.xsd";
+	public static String PATH_TO_XSD = "check.xsd";
 	
 	public enum Currency {
 		dollars, euros
@@ -74,10 +74,14 @@ public class Check {
 		}
 	}
 	
-	public static Check getInstanceFromNode(Node eCheck, Customer c) {
-		int idCheck     = Integer.parseInt(((Element) eCheck).getElementsByTagName("idCheck").item(0).getTextContent());
-		int idBank      = Integer.parseInt(((Element) eCheck).getElementsByTagName("idBank" ).item(0).getTextContent());
-		Node tmp = ((Element) eCheck).getElementsByTagName("amount").item(0);
+	public static int readBankId(Node nCheck) {
+		return Integer.parseInt(((Element) nCheck).getElementsByTagName("idBank").item(0).getTextContent());
+	}
+	
+	public static Check getInstanceFromNode(Node nCheck, Customer c) {
+		int idCheck = Integer.parseInt(((Element) nCheck).getElementsByTagName("idCheck").item(0).getTextContent());
+		int idBank = Check.readBankId(nCheck);
+		Node tmp = ((Element) nCheck).getElementsByTagName("amount").item(0);
 		Currency currency = Currency.valueOf(((Element) tmp).getAttribute("currency"));
 		return new Check(idCheck, idBank, c, currency);
 	}
