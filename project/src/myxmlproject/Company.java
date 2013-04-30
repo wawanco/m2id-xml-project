@@ -132,5 +132,6 @@ public class Company {
 			e.printStackTrace();
 		}
 		(new File(pathToCheck)).delete();
+		bank.cashCheck(dest.toString());
 	}
 }

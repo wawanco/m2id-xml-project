@@ -32,15 +32,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class Bank {
-	private static String PATH_TO_XSD = "customer-base.xsd";
+	private static String PATH_TO_BASE_XSD = "customer-base.xsd";
+	private static String PATH_TO_RC_XSD   = "received-checks.xsd";
 
 	private int      id;
 	private String   name;
 	private String   pathToBase;
 	private Document customerBase;
+	private Document receivedChecks;
 	private String   pathToMailbox;
+	private String   pathToReceivedCheck; 
 
 	// Construtor
 	public Bank(int id, String name) {
@@ -49,32 +53,10 @@ public class Bank {
 		pathToMailbox = "./Bank_" + id;
 		File mb = new File(pathToMailbox);
 		mb.mkdirs();
-		pathToBase    = "./customer-base_" + id + ".xml";
-		File f = new File(pathToBase);
-		// Initialize parser
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		try {
-			dbf.setFeature("http://apache.org/xml/features/validation/schema", true);
-			dbf.setValidating(true);
-			dbf.setNamespaceAware(true);
-			DocumentBuilder db;
-			db = dbf.newDocumentBuilder();
-			if (!f.isFile()) {
-				customerBase = db.newDocument();
-				Element root = customerBase.createElement("customerList");
-				root.setAttributeNS(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "noNamespaceSchemaLocation", PATH_TO_XSD);
-				customerBase.appendChild(root);
-			} else {
-				customerBase = db.parse(f);
-			}
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		writeXML();
+		pathToBase = "./customer-base_" + id + ".xml";
+		pathToReceivedCheck = "./received-checks_" + id + ".xml";
+		customerBase   = InitializeXML("customerList", PATH_TO_BASE_XSD, pathToBase);
+		receivedChecks = InitializeXML("checkList"   , PATH_TO_RC_XSD  , pathToReceivedCheck);
 	}
 
 	// Getters and setters
@@ -115,6 +97,58 @@ public class Bank {
 		}
 	}
 
+	private Document parseFile(File f) {
+		Document doc = null;
+		// Initialize parser
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+			dbf.setFeature("http://apache.org/xml/features/validation/schema", true);
+			dbf.setValidating(true);
+			dbf.setNamespaceAware(true);
+			DocumentBuilder db;
+			db = dbf.newDocumentBuilder();
+			doc = db.parse(f);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return doc;
+	}
+
+	private Document createDoc(String rootName, String pathToXSD) {
+		Document doc = null;
+		// Initialize parser
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+			dbf.setFeature("http://apache.org/xml/features/validation/schema", true);
+			dbf.setValidating(true);
+			dbf.setNamespaceAware(true);
+			DocumentBuilder db;
+			db = dbf.newDocumentBuilder();
+			doc = db.newDocument();
+			Element root = doc.createElement(rootName);
+			root.setAttributeNS(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "noNamespaceSchemaLocation", pathToXSD);
+			doc.appendChild(root);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+		return doc;
+	}
+
+	private Document InitializeXML(String rootName, String pathToXSD, String path) {
+		Document doc = null;
+		File f = new File(path);
+		if(f.isFile())
+			doc = parseFile(f);
+		else
+			doc = createDoc(rootName, pathToXSD);
+		writeDocument(doc, path);
+		return doc;
+	}
+
 	private Node retrieveCustomerNode(int idCustomer) {
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		try {
@@ -144,6 +178,13 @@ public class Bank {
 		int id = dId.intValue();
 		return ++id;
 	}
+	
+	public void cashCheck(String pathToCheck) {
+		Element e = parseFile(new File(pathToCheck)).getDocumentElement();
+		receivedChecks.adoptNode(e);
+		receivedChecks.appendChild(e);
+		writeDocument(receivedChecks, pathToReceivedCheck);
+	}
 
 	private void addCustomerToBase(Customer c) {
 		Element customer = customerBase.createElement("customer");
@@ -158,7 +199,7 @@ public class Bank {
 		customer.appendChild(idCustomer);
 		customer.appendChild(listCheck);
 		customerBase.getDocumentElement().appendChild(customer);
-		writeXML();
+		writeDocument(customerBase, pathToBase);
 	}
 	
 	private void addCheckToBase(Customer customer, Check check) {
@@ -170,16 +211,16 @@ public class Bank {
 		Element eCheckLst = (Element) eCustomer.getElementsByTagName("checkList").item(0);
 		eCheckLst.appendChild(checkNode);
 		// Overwrite base
-		writeXML();
+		writeDocument(customerBase, pathToBase);
 	}
 	
-	public void writeXML() {
+	public void writeDocument(Document doc, String path) {
 		try {
 			// write the content into xml file
 			Transformer tFormer = TransformerFactory.newInstance().newTransformer();
 			tFormer.setOutputProperty(OutputKeys.INDENT, "yes");
-			DOMSource source = new DOMSource(customerBase);
-			StreamResult result = new StreamResult(new File(pathToBase));
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(path));
 			// Output to console for testing
 			tFormer.transform(source, result);
 		} catch (TransformerConfigurationException e) {

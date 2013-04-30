@@ -75,8 +75,8 @@ public class Check {
 	}
 	
 	public static Check getInstanceFromNode(Node eCheck, Customer c) {
-		int idCheck = Integer.parseInt(((Element) eCheck).getElementsByTagName("idCheck").item(0).getTextContent());
-		int idBank  = Integer.parseInt(((Element) eCheck).getElementsByTagName("idBank" ).item(0).getTextContent());
+		int idCheck     = Integer.parseInt(((Element) eCheck).getElementsByTagName("idCheck").item(0).getTextContent());
+		int idBank      = Integer.parseInt(((Element) eCheck).getElementsByTagName("idBank" ).item(0).getTextContent());
 		Node tmp = ((Element) eCheck).getElementsByTagName("amount").item(0);
 		Currency currency = Currency.valueOf(((Element) tmp).getAttribute("currency"));
 		return new Check(idCheck, idBank, c, currency);
