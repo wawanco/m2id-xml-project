@@ -254,9 +254,10 @@ public class Main {
 						b.sendCheckToPayer();
 					}
 					for(Bank b: bankObj){
-						b.debitAccount();
+						b.processChecks();
 					}
-					selection = promptOptions();
+					goShopping = false;
+					System.exit(0);
 				default:
 					System.out.println("Unknown command, try again.");
 					selection = promptOptions();

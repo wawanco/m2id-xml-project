@@ -40,10 +40,10 @@ public class Customer {
 		dir.mkdirs();
 	}
 	
-	public static Customer getInstanceFromNode(Node nCustomer, Bank bank) {
-		Element eIdentity   = (Element) ((Element) nCustomer).getElementsByTagName("identity"  ).item(0);
-		Element eIdCustomer = (Element) ((Element) nCustomer).getElementsByTagName("idCustomer").item(0);
-		Element eBalance    = (Element) ((Element) nCustomer).getElementsByTagName("balance"   ).item(0);
+	public static Customer getInstanceFromElement(Element eCustomer, Bank bank) {
+		Element eIdentity   = (Element) eCustomer.getElementsByTagName("identity"  ).item(0);
+		Element eIdCustomer = (Element) eCustomer.getElementsByTagName("idCustomer").item(0);
+		Element eBalance    = (Element) eCustomer.getElementsByTagName("balance"   ).item(0);
 		Customer c = new Customer(
 			eIdentity.getAttribute("firstname")
 		,	eIdentity.getAttribute("name")
@@ -51,10 +51,10 @@ public class Customer {
 		,	Integer.parseInt(eIdCustomer.getTextContent())
 		,	Double.parseDouble(eBalance.getTextContent())
 		);
-		Node checkList  = ((Element) nCustomer).getElementsByTagName("checkList").item(0);
+		Node checkList  = eCustomer.getElementsByTagName("checkList").item(0);
 		NodeList checks = ((Element) checkList).getElementsByTagName("check");
 		for(int i = 0; i < checks.getLength(); i++) {
-			c.addToCheckBook(Check.getInstanceFromNode(checks.item(i), c));
+			c.addToCheckBook(Check.getInstanceFromElement((Element) checks.item(i), c));
 		}
 		return c;
 	}

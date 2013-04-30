@@ -36,10 +36,26 @@ import org.xml.sax.SAXException;
 public class Check {
 	public static String PATH_TO_XSD = "check.xsd";
 	
+	private static HashMap<String, Integer> monthNb;
+	static {
+		monthNb.put("January"  , Calendar.JANUARY  );
+		monthNb.put("February" , Calendar.FEBRUARY );
+		monthNb.put("March"    , Calendar.MARCH    );
+		monthNb.put("April"    , Calendar.APRIL    );
+		monthNb.put("May"      , Calendar.MAY      );
+		monthNb.put("June"     , Calendar.JUNE     );
+		monthNb.put("July"     , Calendar.JULY     );
+		monthNb.put("August"   , Calendar.AUGUST   );
+		monthNb.put("September", Calendar.SEPTEMBER);
+		monthNb.put("October"  , Calendar.OCTOBER  );
+		monthNb.put("November" , Calendar.NOVEMBER );
+		monthNb.put("December" , Calendar.DECEMBER );
+	};
+	
 	public enum Currency {
 		dollars, euros
 	}
-
+	
 	private boolean  filled;
 	private int 	 id;
 	private int      idBank;
@@ -74,16 +90,43 @@ public class Check {
 		}
 	}
 	
-	public static int readBankId(Node nCheck) {
-		return Integer.parseInt(((Element) nCheck).getElementsByTagName("idBank").item(0).getTextContent());
+	public static int readBankId(Element eCheck) {
+		return Integer.parseInt(eCheck.getElementsByTagName("idBank").item(0).getTextContent());
 	}
 	
-	public static Check getInstanceFromNode(Node nCheck, Customer c) {
-		int idCheck = Integer.parseInt(((Element) nCheck).getElementsByTagName("idCheck").item(0).getTextContent());
-		int idBank = Check.readBankId(nCheck);
-		Node tmp = ((Element) nCheck).getElementsByTagName("amount").item(0);
-		Currency currency = Currency.valueOf(((Element) tmp).getAttribute("currency"));
-		return new Check(idCheck, idBank, c, currency);
+	public static int readCustomerId(Element eCheck) {
+		return Integer.parseInt(eCheck.getElementsByTagName("idCustomer").item(0).getTextContent());
+	}
+	
+	public static double readAmount(Element eCheck) {
+		return Double.parseDouble(eCheck.getElementsByTagName("amount").item(0).getTextContent());
+	}
+	
+	public static int readCheckId(Element eCheck) {
+		return Integer.parseInt(eCheck.getElementsByTagName("idCheck").item(0).getTextContent());
+	}
+	
+	public static Date readDate(Element eCheck) {
+		Element eDate = (Element) eCheck.getElementsByTagName("date").item(0);
+		int day   = Integer.parseInt(eDate.getAttribute("day"));
+		int month = Check.monthNb.get(eDate.getAttribute("month"));
+		int year  = Integer.parseInt(eDate.getAttribute("year"));
+		return new GregorianCalendar(year, month, day).getTime();
+	}
+	
+	public static Check.Currency readCurrency(Node nCheck) {
+		return Check.Currency.valueOf(
+				((Element) (((Element) nCheck).getElementsByTagName("amount").item(0))).getAttribute("currency"));
+	}
+
+	public static Check getInstanceFromElement(Element eCheck, Customer customer) {
+		int idCheck = Integer.parseInt(eCheck.getElementsByTagName("idCheck").item(0).getTextContent());
+		return new Check(
+			idCheck
+		, 	Check.readBankId(eCheck)
+		, 	customer
+		, 	Check.readCurrency(eCheck)
+		);
 	}
 	
 	public int getId() {

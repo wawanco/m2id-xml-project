@@ -24,7 +24,12 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.text.DateFormatSymbols;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class Bank {
 	//===========================
@@ -106,14 +111,14 @@ public class Bank {
 	}
 
 	public Customer retrieveCustomer(int idCustomer) {
-		Node nCustomer = retrieveCustomerNode(idCustomer);
-		return Customer.getInstanceFromNode(nCustomer, this);
+		Element eCustomer = retrieveCustomerElement(idCustomer);
+		return Customer.getInstanceFromElement(eCustomer, this);
 	}
 
 	public void sendCheckToPayer(){
 		NodeList nlChecks = receivedChecks.getDocumentElement().getChildNodes();
 		for(int i = 0; i < nlChecks.getLength(); i++) {
-			int idBank = Check.readBankId(nlChecks.item(i));
+			int idBank = Check.readBankId((Element) nlChecks.item(i));
 			String pathToMailBox = Bank.getPathToMailbox(idBank);
 			Document checkDoc = createDoc("check", Check.PATH_TO_XSD);
 			writeDocument(checkDoc, pathToMailBox);
@@ -129,14 +134,52 @@ public class Bank {
 		f.delete();
 	}
 	
-	public void debitAccount() {
-		;
+	public void processChecks() {
+		File[] xmls = (new File(pathToMailbox)).listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File f, String name) {
+				return name.toLowerCase().endsWith(".xml");
+			}
+		});
+		for(File f: xmls){
+			Element root = parseFile(f).getDocumentElement();
+			Check.Currency currency = Check.readCurrency  (root);
+			double amount           = Check.readAmount    (root);
+			int idCustomer          = Check.readCustomerId(root);
+			int idCheck             = Check.readCheckId   (root);
+			Date date               = Check.readDate      (root);
+			updateCustomerNode(idCustomer, idCheck, amount, currency, date);
+			f.delete();
+		}
 	}
 
 
 	//===========================
 	// Private methods
 	//===========================
+	private void updateCustomerNode(int idCustomer, int idCheck, double amount, Check.Currency currency, Date date){
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(date);
+		Element cust = (Element) retrieveCustomerElement(idCustomer);
+		Element eBalance = (Element) cust.getElementsByTagName("balance").item(0);
+		eBalance.setTextContent(Double.toString(
+				Double.parseDouble(eBalance.getTextContent()) - amount
+		));
+		Element check = retrieveCheckElement(idCustomer, idCheck);
+		check.getElementsByTagName("amount").item(0).setTextContent(Double.toString(amount));
+		Element eDate;
+		if(check.getElementsByTagName("date").getLength() == 0) {
+			eDate = customerBase.createElement("date");
+			check.appendChild(eDate);
+		} else {
+			eDate = (Element) check.getElementsByTagName("date").item(0);
+		}
+		eDate.setAttribute("day"  , "" + cal.get(Calendar.DAY_OF_MONTH));
+		eDate.setAttribute("month", new DateFormatSymbols().getMonths()[cal.get(Calendar.MONTH) - 1]);
+		eDate.setAttribute("year" , "" + cal.get(Calendar.YEAR));
+		writeDocument(customerBase, pathToBase);
+	}
+	
 	private Document parseFile(File f) {
 		Document doc = null;
 		// Initialize parser
@@ -189,11 +232,22 @@ public class Bank {
 		return doc;
 	}
 
-	private Node retrieveCustomerNode(int idCustomer) {
+	private Element retrieveCustomerElement(int idCustomer) {
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		try {
 			String expr = "/customerList/customer[idCustomer = '" + idCustomer + "']";
-			return (Node) xpath.evaluate(expr, customerBase, XPathConstants.NODE);
+			return (Element) xpath.evaluate(expr, customerBase, XPathConstants.NODE);
+		} catch (XPathExpressionException e) {
+			return null;
+		}
+	}
+	
+	private Element retrieveCheckElement(int idCustomer, int idCheck) {
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		try {
+			String expr = 
+				"/customerList/customer[idCustomer = '" + idCustomer + "']/checkList/check[idCheck = '"+ idCheck + "']";
+			return (Element) xpath.evaluate(expr, customerBase, XPathConstants.NODE);
 		} catch (XPathExpressionException e) {
 			return null;
 		}
@@ -237,7 +291,7 @@ public class Bank {
 		Node checkNode = check.createCheckNode();
 		customerBase.adoptNode(checkNode);
 		// Add to checkList
-		Element eCustomer = (Element) retrieveCustomerNode(customer.getId());
+		Element eCustomer = retrieveCustomerElement(customer.getId());
 		Element eCheckLst = (Element) eCustomer.getElementsByTagName("checkList").item(0);
 		eCheckLst.appendChild(checkNode);
 		// Overwrite base
