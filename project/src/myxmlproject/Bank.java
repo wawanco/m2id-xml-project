@@ -92,7 +92,7 @@ public class Bank {
 	// Public methods
 	public Customer registerCustomer(String firstname, String name, int deposit) {
 		// TODO gerer le deposit
-		Customer customer = new Customer(firstname, name, id, generateCustomerId());
+		Customer customer = new Customer(firstname, name, this, generateCustomerId());
 		addCustomerToBase(customer);
 		return customer;
 	}
@@ -126,7 +126,7 @@ public class Bank {
 	
 	public Customer retrieveCustomer(int idCustomer) {
 		Node nCustomer = retrieveCustomerNode(idCustomer);
-		return Customer.getInstanceFromNode(nCustomer, id);
+		return Customer.getInstanceFromNode(nCustomer, this);
 	}
 
 	// Private methods

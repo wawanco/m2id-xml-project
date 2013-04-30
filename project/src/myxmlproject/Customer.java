@@ -19,13 +19,42 @@ public class Customer {
 	// 3. Modifier montant et date OK
 
 	private int id;
-	private int idBank;
+	private Bank   bank;
 	private String name;
 	private String firstname;
 	private String directory;
 	private ArrayList<Check> checkbook;
 	private ArrayList<Product> cart;
 	private int amount;
+
+	// Constructors
+	public Customer(String firstname, String name, Bank bank, int id) {
+		this.firstname = firstname;
+		this.name      = name;
+		this.bank      = bank;
+		this.id        = id;
+		checkbook = new ArrayList<Check>();
+		directory = bank.getPathToMailbox() + "/Customer_" + id;
+		File dir = new File(directory);
+		dir.mkdirs();
+	}
+	
+	public static Customer getInstanceFromNode(Node nCustomer, Bank bank) {
+		Element eIdentity   = (Element) ((Element) nCustomer).getElementsByTagName("identity"  ).item(0);
+		Element eIdCustomer = (Element) ((Element) nCustomer).getElementsByTagName("idCustomer").item(0);
+		Customer c = new Customer(
+			eIdentity.getAttribute("firstname")
+		,	eIdentity.getAttribute("name")
+		,	bank
+		,	Integer.parseInt(eIdCustomer.getTextContent())
+		);
+		Node checkList  = ((Element) nCustomer).getElementsByTagName("checkList").item(0);
+		NodeList checks = ((Element) checkList).getElementsByTagName("check");
+		for(int i = 0; i < checks.getLength(); i++) {
+			c.addToCheckBook(Check.getInstanceFromNode(checks.item(i), c));
+		}
+		return c;
+	}
 
 	public int getAmount() {
 		return amount;
@@ -53,39 +82,6 @@ public class Customer {
 	
 	public ArrayList<Check> getCheckbook() {
 		return checkbook;
-	}
-
-	public int getIdBank() {
-		return idBank;
-	}
-
-	// Constructor
-	public Customer(String firstname, String name, int idBank, int id) {
-		this.firstname = firstname;
-		this.name      = name;
-		this.idBank    = idBank;
-		this.id        = id;
-		checkbook = new ArrayList<Check>();
-		directory = "./Bank_" + idBank + "/Customer_" + id;
-		File dir = new File(directory);
-		dir.mkdirs();
-	}
-	
-	public static Customer getInstanceFromNode(Node nCustomer, int idBank) {
-		Element eIdentity   = (Element) ((Element) nCustomer).getElementsByTagName("identity"  ).item(0);
-		Element eIdCustomer = (Element) ((Element) nCustomer).getElementsByTagName("idCustomer").item(0);
-		Customer c = new Customer(
-			eIdentity.getAttribute("firstname")
-		,	eIdentity.getAttribute("name")
-		,	idBank
-		,	Integer.parseInt(eIdCustomer.getTextContent())
-		);
-		Node checkList  = ((Element) nCustomer).getElementsByTagName("checkList").item(0);
-		NodeList checks = ((Element) checkList).getElementsByTagName("check");
-		for(int i = 0; i < checks.getLength(); i++) {
-			c.addToCheckBook(Check.getInstanceFromNode(checks.item(i), c));
-		}
-		return c;
 	}
 
 	// Getters and setters
@@ -137,7 +133,7 @@ public class Customer {
 	}
 
 	public String toString() {
-		return "Customer name: " + name + "Customer surname: " + firstname + "with customer id " + id + "Bank id" + idBank;
+		return "Customer name: " + name + "Customer surname: " + firstname + "with customer id " + id + "Bank id" + bank.getId();
 	}
 
 }
