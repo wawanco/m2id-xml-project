@@ -5,7 +5,9 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -36,8 +38,18 @@ public class Customer {
 		this.balance   = balance;
 		checkbook = new ArrayList<Check>();
 		directory = bank.getPathToMailbox() + "/Customer_" + id;
-		File dir = new File(directory);
+		File dir  = new File(directory);
 		dir.mkdirs();
+		Path pathToXSD = Paths.get(Check.PATH_TO_XSD);
+		try {
+			Files.copy(
+				pathToXSD
+			, 	Paths.get(directory + "/" + pathToXSD.getFileName())
+			, 	StandardCopyOption.REPLACE_EXISTING
+			);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static Customer getInstanceFromElement(Element eCustomer, Bank bank) {

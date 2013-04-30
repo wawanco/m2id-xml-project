@@ -36,7 +36,7 @@ public class Bank {
 	// Static attributes
 	//===========================
 	private static String PATH_TO_BASE_XSD = "customer-base.xsd";
-	private static String PATH_TO_RC_XSD   = "received-checks.xsd";
+	private static String PATH_TO_RC_XSD   = "received-check.xsd";
 
 	//===========================
 	// Private attributes
@@ -116,12 +116,16 @@ public class Bank {
 	}
 
 	public void sendCheckToPayer(){
-		NodeList nlChecks = receivedChecks.getDocumentElement().getChildNodes();
+		NodeList nlChecks = receivedChecks.getDocumentElement().getElementsByTagName("check");
 		for(int i = 0; i < nlChecks.getLength(); i++) {
-			int idBank = Check.readBankId((Element) nlChecks.item(i));
+			Element eCheck = (Element) nlChecks.item(i);
+			int idBank = Check.readBankId(eCheck);
 			String pathToMailBox = Bank.getPathToMailbox(idBank);
 			Document checkDoc = createDoc("check", Check.PATH_TO_XSD);
-			writeDocument(checkDoc, pathToMailBox);
+			Node newCheck = ((Element) eCheck.cloneNode(true)).getElementsByTagName("check").item(0);
+			checkDoc.adoptNode(newCheck);
+			checkDoc.getDocumentElement().appendChild(newCheck);
+			writeDocument(checkDoc, pathToMailBox + "/check_from_" + id + "_" + i + ".xml");
 		}
 	}
 	

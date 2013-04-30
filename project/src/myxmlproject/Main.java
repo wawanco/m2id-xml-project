@@ -248,7 +248,7 @@ public class Main {
 				case 3:
 					goShopping = false;
 					System.exit(0);
-					break;
+					break;	
 				case 4:
 					for(Bank b: bankObj){
 						b.sendCheckToPayer();

@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
@@ -34,10 +35,11 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 public class Check {
-	public static String PATH_TO_XSD = "check.xsd";
+	public static String PATH_TO_XSD = new File("check.xsd").getAbsolutePath();
 	
 	private static HashMap<String, Integer> monthNb;
 	static {
+		monthNb = new HashMap<String, Integer>();
 		monthNb.put("January"  , Calendar.JANUARY  );
 		monthNb.put("February" , Calendar.FEBRUARY );
 		monthNb.put("March"    , Calendar.MARCH    );
@@ -179,10 +181,11 @@ public class Check {
 			// On remplit la date
 			GregorianCalendar calendar = new GregorianCalendar();
 			calendar.setTime(date);
+			String month = new DateFormatSymbols(new Locale("en_US")).getMonths()[calendar.get(Calendar.MONTH)];
 			Element eDate = doc.createElement("date");
 			doc.getDocumentElement().appendChild(eDate);
 			eDate.setAttribute("day"  , "" + calendar.get(Calendar.DAY_OF_MONTH));
-			eDate.setAttribute("month", new DateFormatSymbols().getMonths()[calendar.get(Calendar.MONTH) - 1]);
+			eDate.setAttribute("month", month);
 			eDate.setAttribute("year" , "" + calendar.get(Calendar.YEAR));
 			filled = true;
 			writeXml();
