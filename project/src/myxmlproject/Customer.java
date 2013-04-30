@@ -25,14 +25,15 @@ public class Customer {
 	private String directory;
 	private ArrayList<Check> checkbook;
 	private ArrayList<Product> cart;
-	private int amount;
+	private double balance;
 
 	// Constructors
-	public Customer(String firstname, String name, Bank bank, int id) {
+	public Customer(String firstname, String name, Bank bank, int id, double balance) {
 		this.firstname = firstname;
 		this.name      = name;
 		this.bank      = bank;
 		this.id        = id;
+		this.balance   = balance;
 		checkbook = new ArrayList<Check>();
 		directory = bank.getPathToMailbox() + "/Customer_" + id;
 		File dir = new File(directory);
@@ -42,11 +43,13 @@ public class Customer {
 	public static Customer getInstanceFromNode(Node nCustomer, Bank bank) {
 		Element eIdentity   = (Element) ((Element) nCustomer).getElementsByTagName("identity"  ).item(0);
 		Element eIdCustomer = (Element) ((Element) nCustomer).getElementsByTagName("idCustomer").item(0);
+		Element eBalance    = (Element) ((Element) nCustomer).getElementsByTagName("balance"   ).item(0);
 		Customer c = new Customer(
 			eIdentity.getAttribute("firstname")
 		,	eIdentity.getAttribute("name")
 		,	bank
 		,	Integer.parseInt(eIdCustomer.getTextContent())
+		,	Double.parseDouble(eBalance.getTextContent())
 		);
 		Node checkList  = ((Element) nCustomer).getElementsByTagName("checkList").item(0);
 		NodeList checks = ((Element) checkList).getElementsByTagName("check");
@@ -56,12 +59,8 @@ public class Customer {
 		return c;
 	}
 
-	public int getAmount() {
-		return amount;
-	}
-
-	public void setAmount(int amount) {
-		this.amount = amount;
+	public double getBalance() {
+		return balance;
 	}
 
 	public ArrayList<Product> getCart() {

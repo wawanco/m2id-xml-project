@@ -83,9 +83,8 @@ public class Bank {
 	}
 
 	// Others
-	public Customer registerCustomer(String firstname, String name, int deposit) {
-		// TODO gerer le deposit
-		Customer customer = new Customer(firstname, name, this, generateCustomerId());
+	public Customer registerCustomer(String firstname, String name, double deposit) {
+		Customer customer = new Customer(firstname, name, this, generateCustomerId(), deposit);
 		addCustomerToBase(customer);
 		return customer;
 	}
@@ -217,6 +216,8 @@ public class Bank {
 	private void addCustomerToBase(Customer c) {
 		Element customer = customerBase.createElement("customer");
 		Element identite = customerBase.createElement("identity");
+		Element balance  = customerBase.createElement("balance" );
+		balance.setTextContent(String.valueOf(c.getBalance()));
 		identite.setAttribute("firstname", c.getFirstname());
 		identite.setAttribute("name", c.getName());
 		Element idCustomer = customerBase.createElement("idCustomer");
@@ -226,6 +227,7 @@ public class Bank {
 		customer.appendChild(identite);
 		customer.appendChild(idCustomer);
 		customer.appendChild(listCheck);
+		customer.appendChild(balance);
 		customerBase.getDocumentElement().appendChild(customer);
 		writeDocument(customerBase, pathToBase);
 	}
