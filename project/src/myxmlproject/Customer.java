@@ -116,7 +116,7 @@ public class Customer {
 		return -1;
 	}
 	
-	public void sendCheck(int idCheck, Company c) throws IOException {
+	public String sendCheck(int idCheck, Company c) throws IOException {
 		int i = 0;
 		while(i < checkbook.size()) {
 			Check check = checkbook.get(i);
@@ -129,11 +129,11 @@ public class Customer {
 				);
 				checkbook.remove(i);
 				check.delete();
-				return;
+				return dest;
 			}
 			i++;
 		}
-		return;
+		return null;
 	}
 
 	public String toString() {

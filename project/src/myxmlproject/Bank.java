@@ -37,16 +37,18 @@ public class Bank {
 	private static String PATH_TO_XSD = "customer-base.xsd";
 	private static String BASE_DIR = ".";
 
-	private int id;
-	private String name;
-	private String pathToBase;
+	private int      id;
+	private String   name;
+	private String   pathToBase;
 	private Document customerBase;
+	private String   pathToMailbox;
 
 	// Construtor
 	public Bank(int id, String name) {
-		this.id = id;
-		this.name = name;
-		pathToBase = BASE_DIR + "/customer-base_" + id + ".xml";
+		this.id    = id;
+		this.name  = name;
+		pathToMailbox = "./Bank_" + id;
+		pathToBase    = BASE_DIR + "/customer-base_" + id + ".xml";
 		File f = new File(pathToBase);
 		// Initialize parser
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -81,6 +83,10 @@ public class Bank {
 
 	public String getName() {
 		return name;
+	}
+	
+	public String getPathToMailbox() {
+		return pathToMailbox;
 	}
 
 	// Public methods

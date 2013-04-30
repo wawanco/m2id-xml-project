@@ -64,7 +64,7 @@ public class Main {
 			if(qName.equals("company")) {
 				ArrayList<Product> myProductList = new ArrayList<Product>();
 				for(Product p: pList) myProductList.add(p.clone());
-				cList.add(new Company(i++, cName, idBank, minAmount, Check.Currency.valueOf(currency), myProductList));
+				cList.add(new Company(i++, cName, bankObj[idBank], minAmount, Check.Currency.valueOf(currency), myProductList));
 				pList.clear();
 			}
 		}
@@ -232,10 +232,12 @@ public class Main {
 							if(idCheck == -1) {
 								System.out.println("Your order for " + myCompany.getName() + " cannot be completed");
 							} else {
-								customer.sendCheck(idCheck, myCompany);
+								String pathToCheck = customer.sendCheck(idCheck, myCompany);
 								o.sendOrder(myCompany.getPathToMailbox());
-								if(myCompany.checkOrder(myCompany.getPathToMailbox() + "/order.xml"))
+								if(myCompany.checkOrder(myCompany.getPathToMailbox() + "/order.xml")){
 									System.out.println("Your order for " + myCompany.getName() + " is completed");
+									myCompany.sendCheck(pathToCheck);
+								}
 							}
 						}
 					} else {

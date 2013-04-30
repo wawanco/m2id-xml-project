@@ -39,15 +39,15 @@ public class Company {
 	private int id;
 	private String name;
 	private String pathToMailbox;
-	private int idBank;
+	private Bank bank;
 	private double minAmount;
 	private Check.Currency currency;
 	private ArrayList<Product> productList;
 
-	public Company(int id, String name, int idBank, double minAmount, Check.Currency currency, ArrayList<Product> productList) {
+	public Company(int id, String name, Bank bank, double minAmount, Check.Currency currency, ArrayList<Product> productList) {
 		this.id          = id;
 		this.name        = name;
-		this.idBank      = idBank;
+		this.bank        = bank;
 		this.minAmount   = minAmount;
 		this.currency    = currency;
 		this.productList = productList;
@@ -139,17 +139,15 @@ public class Company {
 		return false;
 	}
 
-	public void sendCheck() {
-		// fonction in order to send the check to the companie's bank after the
-		// validation of order's content
-		Path source = Paths.get("/project/mailBox/check.xml");
-		Path dest = Paths.get("/project/BankMailBox/check.xml");
+	public void sendCheck(String pathToCheck) {
+		// Send the check to the companie's bank after the order content validation
+		Path source = Paths.get(pathToCheck);
+		Path dest   = Paths.get(bank.getPathToMailbox());
 		try {
 			Files.copy(source, dest, REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		File file = new File("/project/mailBox/check.xml");
-		file.delete();
+		new File(pathToCheck).delete();
 	}
 }
