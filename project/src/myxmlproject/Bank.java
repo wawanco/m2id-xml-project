@@ -49,7 +49,7 @@ public class Bank {
 		pathToMailbox = "./Bank_" + id;
 		File mb = new File(pathToMailbox);
 		mb.mkdirs();
-		pathToBase    = "/customer-base_" + id + ".xml";
+		pathToBase    = "./customer-base_" + id + ".xml";
 		File f = new File(pathToBase);
 		// Initialize parser
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

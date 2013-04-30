@@ -23,7 +23,7 @@ public class Main {
 		private ArrayList<Product> pList;
 		private ArrayList<Company> cList;
 		static int i = 0;
-		static int idBank = 0;
+		static int idBank = 1;
 		
         @Override
 		public void startDocument() throws SAXException {
@@ -64,7 +64,7 @@ public class Main {
 			if(qName.equals("company")) {
 				ArrayList<Product> myProductList = new ArrayList<Product>();
 				for(Product p: pList) myProductList.add(p.clone());
-				cList.add(new Company(i++, cName, bankObj[idBank], minAmount, Check.Currency.valueOf(currency), myProductList));
+				cList.add(new Company(i++, cName, bankObj[idBank-1], minAmount, Check.Currency.valueOf(currency), myProductList));
 				pList.clear();
 			}
 		}
@@ -79,16 +79,16 @@ public class Main {
 			BufferedReader stdinp = new BufferedReader(new InputStreamReader(System.in));
 			System.out.println("To which bank have been registered?");
 			for(int i = 0; i < bankObj.length; i++) {
-				System.out.println("Type " + i + " for " + bankObj[i].getName() + ".");
+				System.out.println("Type " + (i + 1)  + " for " + bankObj[i].getName() + ".");
 			}
 			int idBank = Integer.parseInt(stdinp.readLine());
 			System.out.println("What is your identification number?");
 			int id = Integer.parseInt(stdinp.readLine());
-			Customer customer = bankObj[idBank].retrieveCustomer(id);
+			Customer customer = bankObj[idBank - 1].retrieveCustomer(id);
 			while(customer == null){
 				System.out.println("Your id has not been found, try it again..");
 				id = Integer.parseInt(stdinp.readLine());
-				customer = bankObj[idBank].retrieveCustomer(id);
+				customer = bankObj[idBank - 1].retrieveCustomer(id);
 			}
 			System.out.println("Hello " + customer.getFirstname() + " " + customer.getName() + "!");
 			return customer;
@@ -102,8 +102,8 @@ public class Main {
 		try {
 			BufferedReader stdinp = new BufferedReader(new InputStreamReader(System.in));
 			System.out.println("Please, choose your bank.");
-			for(int i = 0; i < bankObj.length; i++) {
-				System.out.println("Type " + i + " for " + bankObj[i].getName() + ".");
+			for(int i = 1; i <= bankObj.length; i++) {
+				System.out.println("Type " + i + " for " + bankObj[i - 1].getName() + ".");
 			}
 			int idBank = Integer.parseInt(stdinp.readLine());
 			System.out.println("Please type your name.");
@@ -112,14 +112,14 @@ public class Main {
 			String firstname = stdinp.readLine();
 			System.out.println("How much money do you want to deposit on your account (in Euros)?");
 			int amount = Integer.parseInt(stdinp.readLine());
-			Customer newCustomer = bankObj[idBank].registerCustomer(firstname, name, amount);
+			Customer newCustomer = bankObj[idBank - 1].registerCustomer(firstname, name, amount);
 			System.out.println("Thank you. You have been registered.");
 			System.out.println("How many checks do you want :");
 			System.out.println("In Euros ?");
 			int nbEuros = Integer.parseInt(stdinp.readLine());
 			System.out.println("In Dollars ?");
 			int nbDollars = Integer.parseInt(stdinp.readLine());
-			bankObj[idBank].generateChecks(newCustomer, nbEuros, nbDollars);
+			bankObj[idBank - 1].generateChecks(newCustomer, nbEuros, nbDollars);
 			System.out.println("Your " + (nbDollars + nbEuros) + " check have been generated in your customer directory:");
 			System.out.println("--> " + newCustomer.getDirectory());
 			return newCustomer;
@@ -150,7 +150,7 @@ public class Main {
 	public static void main(String[] args) {
 		// Initializing
 		for(int i = 0; i < banks.length; i++) {
-			bankObj[i] = new Bank(i, banks[i]);
+			bankObj[i] = new Bank(i + 1, banks[i]);
 		}
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		try {
