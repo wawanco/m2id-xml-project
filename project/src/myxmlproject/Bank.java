@@ -26,7 +26,6 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -144,12 +143,7 @@ public class Bank {
 	}
 	
 	public void processChecks() {
-		File[] xmls = (new File(pathToMailbox)).listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File f, String name) {
-				return name.toLowerCase().endsWith(".xml");
-			}
-		});
+		File[] xmls = pickupMails();
 		for(File f: xmls){
 			Element root = parseFile(f).getDocumentElement();
 			Check.Currency currency = Check.readCurrency  (root);
@@ -166,6 +160,15 @@ public class Bank {
 	//===========================
 	// Private methods
 	//===========================
+	private File[] pickupMails() {
+		return (new File(pathToMailbox)).listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File f, String name) {
+				return name.toLowerCase().endsWith(".xml");
+			}
+		});		
+	}
+	
 	private void updateCustomerNode(int idCustomer, int idCheck, double amount, Check.Currency currency, Date date){
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.setTime(date);

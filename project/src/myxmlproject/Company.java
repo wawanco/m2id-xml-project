@@ -18,7 +18,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Company {
-
+	//===========================
+	// Private attributes
+	//===========================
 	private int id;
 	private String name;
 	private String pathToMailbox;
@@ -27,6 +29,9 @@ public class Company {
 	private Check.Currency currency;
 	private ArrayList<Product> productList;
 
+	//===========================
+	// Constructor
+	//===========================
 	public Company(int id, String name, Bank bank, double minAmount, Check.Currency currency, ArrayList<Product> productList) {
 		this.id          = id;
 		this.name        = name;
@@ -39,36 +44,27 @@ public class Company {
 		dir.mkdirs();
 	}
 
+	//===========================
+	// Public methods
+	//===========================
+	public int getId() {
+		return id;
+	}
+	
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public ArrayList<Product> getProductList() {
 		return productList;
 	}
 
-	public void setProductList(ArrayList<Product> productList) {
-		this.productList = productList;
-	}
-
 	public double getMinAmount() {
 		return minAmount;
 	}
 
-	public void setMinAmount(int min_amount) {
-		this.minAmount = minAmount;
-	}
-
 	public Check.Currency getCurrency() {
 		return currency;
-	}
-
-	public void setCurrency(Check.Currency currency) {
-		this.currency = currency;
 	}
 	
 	public String getPathToMailbox() {
@@ -84,7 +80,6 @@ public class Company {
 	}
 
 	public boolean checkOrder(String pathToOrder) {
-		// TODO Utiliser un schema pour la validation?
 		boolean validate = true;
 		int sumAmount = 0;
 		try {
@@ -109,7 +104,6 @@ public class Company {
 				((Element) doc.getElementsByTagName("currency").item(0)).getAttribute("type")
 			);
 			validate &= (oCurrency.equals(currency));
-			//TODO Si la commande est validee il faudrait diminuer le stock.
 			Files.delete(Paths.get(pathToOrder));
 			return validate;
 		} catch (ParserConfigurationException e) {

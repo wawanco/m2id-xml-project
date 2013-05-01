@@ -10,33 +10,29 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-import org.xml.sax.SAXException;
 
 public class Check {
+	//===========================
+	// Static attributes
+	//===========================
 	public static String PATH_TO_XSD = new File("check.xsd").getAbsolutePath();
-	
 	private static HashMap<String, Integer> monthNb;
 	static {
 		monthNb = new HashMap<String, Integer>();
@@ -53,22 +49,25 @@ public class Check {
 		monthNb.put("November" , Calendar.NOVEMBER );
 		monthNb.put("December" , Calendar.DECEMBER );
 	};
-	
 	public enum Currency {
 		dollars, euros
 	}
 	
+	//===========================
+	// Private attributes
+	//===========================
 	private boolean  filled;
 	private int 	 id;
 	private int      idBank;
 	private int      idCustomer;
 	private int      amount;
 	private String   pathToXml;
-	private Date     issueDate;
 	private Currency currency;
 	private Document doc;
 	
-	// Constructor
+	//===========================
+	// Constructors
+	//===========================
 	public Check(int id, int idBank, Customer customer, Currency currency){
 		this.id         = id;
 		this.idBank     = idBank;
@@ -77,7 +76,6 @@ public class Check {
 		filled = false;
 		pathToXml = customer.getDirectory() + "/check_" + id + ".xml";
 		amount = 0;
-		
 		// Build xml DOM document
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -92,6 +90,19 @@ public class Check {
 		}
 	}
 	
+	public static Check getInstanceFromElement(Element eCheck, Customer customer) {
+		int idCheck = Integer.parseInt(eCheck.getElementsByTagName("idCheck").item(0).getTextContent());
+		return new Check(
+			idCheck
+		, 	Check.readBankId(eCheck)
+		, 	customer
+		, 	Check.readCurrency(eCheck)
+		);
+	}
+
+	//===========================
+	// Static methods
+	//===========================
 	public static String getEnglishMonth(Date date) {
 		GregorianCalendar calendar = new GregorianCalendar();
 		calendar.setTime(date);
@@ -127,28 +138,14 @@ public class Check {
 				((Element) (((Element) nCheck).getElementsByTagName("amount").item(0))).getAttribute("currency"));
 	}
 
-	public static Check getInstanceFromElement(Element eCheck, Customer customer) {
-		int idCheck = Integer.parseInt(eCheck.getElementsByTagName("idCheck").item(0).getTextContent());
-		return new Check(
-			idCheck
-		, 	Check.readBankId(eCheck)
-		, 	customer
-		, 	Check.readCurrency(eCheck)
-		);
-	}
-	
+	//===========================
+	// Public methods
+	//===========================
+	// Getters and setters
 	public int getId() {
 		return id;
 	}
 
-	public int getIdBank() {
-		return idBank;
-	}
-
-	public int getIdCustomer() {
-		return idCustomer;
-	}
-	
 	public String getPathToXml() {
 		return pathToXml;
 	}
@@ -161,6 +158,7 @@ public class Check {
 		return filled;
 	}
 
+	// Other public methods
 	public Element createCheckNode() {
 		Element root = doc.createElement("check");
 		root.setAttributeNS(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "noNamespaceSchemaLocation", PATH_TO_XSD);
@@ -177,35 +175,19 @@ public class Check {
 	}
 	
 	public void fillCheck(double amount, Date date) {
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db;
-		try {
-			db = dbf.newDocumentBuilder();
-			// On remplit le montant
-			NodeList amountList = doc.getDocumentElement().getElementsByTagName("amount");
-			((Element) amountList.item(0)).setTextContent(Double.toString(amount));
-			// On remplit la date
-			GregorianCalendar calendar = new GregorianCalendar();
-			calendar.setTime(date);
-			Element eDate = doc.createElement("date");
-			doc.getDocumentElement().appendChild(eDate);
-			eDate.setAttribute("day"  , "" + calendar.get(Calendar.DAY_OF_MONTH));
-			eDate.setAttribute("month", getEnglishMonth(date));
-			eDate.setAttribute("year" , "" + calendar.get(Calendar.YEAR));
-			filled = true;
-			writeXml();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	// Getters and setters
-	public void setAmount(int amount) {
-		this.amount = amount;
-	}
-	
-	public void setIssueDate(Date issueDate) {
-		this.issueDate = issueDate;
+		// On remplit le montant
+		NodeList amountList = doc.getDocumentElement().getElementsByTagName("amount");
+		((Element) amountList.item(0)).setTextContent(Double.toString(amount));
+		// On remplit la date
+		GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTime(date);
+		Element eDate = doc.createElement("date");
+		doc.getDocumentElement().appendChild(eDate);
+		eDate.setAttribute("day"  , "" + calendar.get(Calendar.DAY_OF_MONTH));
+		eDate.setAttribute("month", getEnglishMonth(date));
+		eDate.setAttribute("year" , "" + calendar.get(Calendar.YEAR));
+		filled = true;
+		writeXml();
 	}
 	
 	public void delete() {

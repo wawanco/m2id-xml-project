@@ -16,20 +16,20 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Customer {
-	// 1. Choisir le GdC (getter/setter idBank?)
-	// 2. Envoyer les infos au GdC
-	// 3. Modifier montant et date OK
+	//===========================
+	// Private attributes
+	//===========================
+	private int                id;
+	private Bank               bank;
+	private String             name;
+	private String             firstname;
+	private String             directory;
+	private ArrayList<Check>   checkbook;
+	private double             balance;
 
-	private int id;
-	private Bank   bank;
-	private String name;
-	private String firstname;
-	private String directory;
-	private ArrayList<Check> checkbook;
-	private ArrayList<Product> cart;
-	private double balance;
-
+	//===========================
 	// Constructors
+	//===========================
 	public Customer(String firstname, String name, Bank bank, int id, double balance) {
 		this.firstname = firstname;
 		this.name      = name;
@@ -71,16 +71,12 @@ public class Customer {
 		return c;
 	}
 
+	//===========================
+	// Public methods
+	//===========================
+	// Getters and setters
 	public double getBalance() {
 		return balance;
-	}
-
-	public ArrayList<Product> getCart() {
-		return cart;
-	}
-
-	public void setCart(ArrayList<Product> cart) {
-		this.cart = cart;
 	}
 
 	public String getName() {
@@ -95,7 +91,6 @@ public class Customer {
 		return checkbook;
 	}
 
-	// Getters and setters
 	public int getId() {
 		return id;
 	}
@@ -104,7 +99,7 @@ public class Customer {
 		return directory;
 	}
 
-	// Public methods
+	// Other public methods
 	public void addToCheckBook(Check check) {
 		checkbook.add(check);
 	}
@@ -146,5 +141,4 @@ public class Customer {
 	public String toString() {
 		return "Customer name: " + name + "Customer surname: " + firstname + "with customer id " + id + "Bank id" + bank.getId();
 	}
-
 }

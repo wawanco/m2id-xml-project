@@ -1,7 +1,6 @@
 package myxmlproject;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,16 +20,18 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class Order {
-
+	//===========================
+	// Private attributes
+	//===========================
 	private int id;
 	private int idCustomer;
-	private HashMap<Product, Integer> cart;
-	private String companyName;
 	private int idCompany;
-	private int idCompanyBank;
-	private Check.Currency currency;
-	private int orderSum = 0;
+	private HashMap<Product, Integer> cart;
+	private Check.Currency            currency;
 
+	//===========================
+	// Constructors
+	//===========================
 	public Order(int id, int idCustomer, int idCompany, Check.Currency currency) {
 		this.id = id;
 		this.idCompany  = idCompany;
@@ -39,10 +40,15 @@ public class Order {
 		cart = new HashMap<Product, Integer>();
 	}
 	
+	//===========================
+	// Public methods
+	//===========================
+	// Getters and setters
 	public int getIdCompany() {
 		return idCompany;
 	}
 
+	// Other public methods
 	public void addProduct(Product p, int quantity) {
 		if(cart.containsKey(p)) {
 			cart.put(p, cart.get(p) + quantity);
