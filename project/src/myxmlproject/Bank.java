@@ -122,18 +122,23 @@ public class Bank {
 			int idBank = Check.readBankId(eCheck);
 			String pathToMailBox = Bank.getPathToMailbox(idBank);
 			Document checkDoc = createDoc("check", Check.PATH_TO_XSD);
-			Node newCheck = ((Element) eCheck.cloneNode(true)).getElementsByTagName("check").item(0);
-			checkDoc.adoptNode(newCheck);
-			checkDoc.getDocumentElement().appendChild(newCheck);
+			NodeList newNodes = eCheck.getChildNodes();
+			for(int j = 0; j < newNodes.getLength(); j++) {
+				Node n = newNodes.item(j).cloneNode(true);
+				checkDoc.adoptNode(n);
+				checkDoc.getDocumentElement().appendChild(n);
+			}
 			writeDocument(checkDoc, pathToMailBox + "/check_from_" + id + "_" + i + ".xml");
+			receivedChecks.getDocumentElement().removeChild(eCheck);
 		}
+		writeDocument(receivedChecks, pathToReceivedCheck);
 	}
 	
 	public void cashCheck(String pathToCheck) {
 		File f = new File(pathToCheck);
-		Element e = parseFile(f).getDocumentElement();
-		receivedChecks.adoptNode(e);
-		receivedChecks.getDocumentElement().appendChild(e);
+		Node n = parseFile(f).getDocumentElement().cloneNode(true);
+		receivedChecks.adoptNode(n);
+		receivedChecks.getDocumentElement().appendChild(n);
 		writeDocument(receivedChecks, pathToReceivedCheck);
 		f.delete();
 	}
@@ -179,7 +184,7 @@ public class Bank {
 			eDate = (Element) check.getElementsByTagName("date").item(0);
 		}
 		eDate.setAttribute("day"  , "" + cal.get(Calendar.DAY_OF_MONTH));
-		eDate.setAttribute("month", new DateFormatSymbols().getMonths()[cal.get(Calendar.MONTH) - 1]);
+		eDate.setAttribute("month", Check.getEnglishMonth(date));
 		eDate.setAttribute("year" , "" + cal.get(Calendar.YEAR));
 		writeDocument(customerBase, pathToBase);
 	}

@@ -92,6 +92,12 @@ public class Check {
 		}
 	}
 	
+	public static String getEnglishMonth(Date date) {
+		GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTime(date);
+		return new DateFormatSymbols(new Locale("en_US")).getMonths()[calendar.get(Calendar.MONTH)];
+	}
+	
 	public static int readBankId(Element eCheck) {
 		return Integer.parseInt(eCheck.getElementsByTagName("idBank").item(0).getTextContent());
 	}
@@ -181,11 +187,10 @@ public class Check {
 			// On remplit la date
 			GregorianCalendar calendar = new GregorianCalendar();
 			calendar.setTime(date);
-			String month = new DateFormatSymbols(new Locale("en_US")).getMonths()[calendar.get(Calendar.MONTH)];
 			Element eDate = doc.createElement("date");
 			doc.getDocumentElement().appendChild(eDate);
 			eDate.setAttribute("day"  , "" + calendar.get(Calendar.DAY_OF_MONTH));
-			eDate.setAttribute("month", month);
+			eDate.setAttribute("month", getEnglishMonth(date));
 			eDate.setAttribute("year" , "" + calendar.get(Calendar.YEAR));
 			filled = true;
 			writeXml();
