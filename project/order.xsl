@@ -7,94 +7,55 @@
 	<xsl:template match="/">
 		<html>
 			<title> Order List </title>
-			<xsl:apply-templates select="//orderList" />
+			<xsl:apply-templates select="//order" />
 		</html>
 	</xsl:template>
 
 
-	<xsl:template match="//orderList">
+	<xsl:template match="//order">
 		<h2>
-			The company with id number 0 has
-			<xsl:value-of select="count(order/company/id[contains(., '2')]) " /> <!-- HERE -->
-			orders
+			The customer with id number
+			<xsl:value-of select="idCustomer/text()" />
+			requests from the company with id number
+			<xsl:value-of select="idCompany/text()" />
+			the following order in
+			<xsl:value-of select="currency/@type" />
+			:
 		</h2>
-		<xsl:apply-templates select="//order" />
+		<xsl:apply-templates select="//item" />
+
 	</xsl:template>
 
-	<xsl:template match="order">
-		<xsl:choose>
-			<xsl:when test="company/id='2'"> <!-- HERE -->
-				<p>
-					<h3>
-						- Order :
-					</h3>
-					<h4>
-						Customer with id number -
-						<xsl:value-of select="customer/idCustomer/text()" />
-						- ordered a total of
-
-						-
-						<xsl:value-of
-							select="count(customer/cart/product/name[contains(concat(' ',.,' 
-				'), customer/cart/product/name)])" />
-						- product(s):
-					</h4>
-					<xsl:choose>
-						<xsl:when
-							test="count(customer/cart/product/name[contains(concat(' ',.,' 
-				'), customer/cart/product/name)]) > 2">
-							<xsl:apply-templates select="//product" />
-						</xsl:when>
-						<xsl:otherwise>
-							Product Name:
-							<xsl:value-of select="customer/cart/product/name/text()" />
-							| Unit Price:
-							'
-							<xsl:value-of select="customer/cart/product/unitPrice/text()" />
-							'
-							<xsl:value-of select="customer/cart/product/currency/@type" />
-						</xsl:otherwise>
-					</xsl:choose>
-					<h4>
-						from the company '
-						<xsl:value-of select="company/name/text()" />
-						'
-						with a total cost of '
-						<xsl:call-template name="sum">
-							<xsl:with-param name="noeud"
-								select="customer/cart/product/unitPrice" />
-						</xsl:call-template>
-						'
-						<xsl:value-of select="customer/cart/product/currency/@type" />
-					</h4>
-				</p>
-			</xsl:when>
-		</xsl:choose>
-	</xsl:template>
-
-
-	<xsl:template match="product">
-		<xsl:choose>
-			<xsl:when test="id='2'">  <!-- HERE -->
-				<p>
-					Product Name:
-					<xsl:value-of select="name/text()" />
-					| Unit Price:
-					'
-					<xsl:value-of select="unitPrice/text()" />
-					'
-					<xsl:value-of select="currency/@type" />
-
-				</p>
-			</xsl:when>
-		</xsl:choose>
+	<xsl:template match="item">
+		<p>
+			<h3>
+				- Item :
+			</h3>
+			Product Name:
+			<xsl:value-of select="product/name/text()" />
+			| Unit Price:
+			'
+			<xsl:value-of select="product/unitPrice/text()" />
+			'
+			| Quantity :
+			<xsl:value-of select="quantity/text()" />
+			<h4>
+				from the company with a total cost of '
+				<xsl:call-template name="sum">
+					<xsl:with-param name="n1" select="product/unitPrice" />
+					<xsl:with-param name="n2" select="quantity" />
+				</xsl:call-template>
+				'
+			</h4>
+		</p>
 	</xsl:template>
 
 	<xsl:template name="sum">
-		<xsl:param name="noeud" />
-		<xsl:variable name="n" select="sum($noeud)" />
+		<xsl:param name="n1" />
+		<xsl:param name="n2" />
+		<xsl:variable name="n" select="$n1*$n2" />
 		<xsl:value-of select="$n" />
+		<xsl:value-of select="sum(n)"/>
 	</xsl:template>
-
 
 </xsl:stylesheet>
